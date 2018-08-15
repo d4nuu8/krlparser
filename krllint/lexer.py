@@ -213,16 +213,21 @@ class Lexer:
             self._advance()
 
             if self._current_char in ["H", "h"]:
-                self._advance()
                 base = 16
 
             if self._current_char in ["B", "b"]:
-                self._advance()
                 base = 2
 
+            self._advance()
             value = self._read_until("'")
-            return Token(tokens.INTEGER, int(value, base),
-                         self._line_number, start)
+
+            try:
+                return Token(tokens.INTEGER, int(value, base),
+                             self._line_number, start)
+            except ValueError:
+                return Token(tokens.ERROR_TOKEN, "Invalid syntax!",
+                             self._line_number, start)
+
 
     def _create_token_at_position(self, token_type, value):
         self._advance()

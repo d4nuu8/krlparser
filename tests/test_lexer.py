@@ -45,6 +45,10 @@ class LexerTestCase(TestCase):
         lexer = Lexer("'H1F")
         self.assertEqual(Token(tokens.INTEGER, int("1f", 16), 0, 0), lexer.get_next_token())
 
+    def test_invalid_hex_digit(self):
+        lexer = Lexer("'H1FJ")
+        self.assertEqual(tokens.ERROR_TOKEN, lexer.get_next_token().token_type)
+
     def test_bin_digit(self):
         lexer = Lexer("'B1010")
         self.assertEqual(Token(tokens.INTEGER, int("1010", 2), 0, 0), lexer.get_next_token())
