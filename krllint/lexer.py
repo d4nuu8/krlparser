@@ -20,87 +20,114 @@ class Lexer:
         self._current_token = None
         self._current_char = self._input[self._pos]
         self._error = None
-  
+
     def get_next_token(self):
         # Error
-        if self._error is not None: return self._error
+        if self._error is not None:
+            return self._error
 
         # End of file (EOF)
-        if self._current_char is None: return self._end_of_file()
+        if self._current_char is None:
+            return self._end_of_file()
 
         # End of line (EOL)
-        if self._current_char == os.linesep: return self._end_of_line()
+        if self._current_char == os.linesep:
+            return self._end_of_line()
 
         # Whitespace
-        if self._current_char.isspace(): self._skip_whitespace()
+        if self._current_char.isspace():
+            self._skip_whitespace()
 
         # Comment
-        if self._current_char == ";": return self._comment()
+        if self._current_char == ";":
+            return self._comment()
 
         # File attribute
-        if self._current_char == "&": return self._file_attribute()
+        if self._current_char == "&":
+            return self._file_attribute()
 
         # String
-        if self._current_char == "\"": return self._string()
+        if self._current_char == "\"":
+            return self._string()
 
         # Name
-        if self._current_char in FIRST_CHARACTERS_NAME: return self._name()
+        if self._current_char in FIRST_CHARACTERS_NAME:
+            return self._name()
 
         # Numbers
-        if self._current_char.isdigit() or self._current_char == "'": return self._number()
+        if self._current_char.isdigit() or self._current_char == "'":
+            return self._number()
 
         # Plus (+)
-        if self._current_char == "+": return self._create_token_at_position(tokens.PLUS, "+")            
+        if self._current_char == "+":
+            return self._create_token_at_position(tokens.PLUS, "+")
 
         # Minus (-)
-        if self._current_char == "-": return self._create_token_at_position(tokens.MINUS, "-")            
+        if self._current_char == "-":
+            return self._create_token_at_position(tokens.MINUS, "-")
 
         # Star (*)
-        if self._current_char == "*": return self._create_token_at_position(tokens.STAR, "*")            
+        if self._current_char == "*":
+            return self._create_token_at_position(tokens.STAR, "*")
 
         # Slash (/)
-        if self._current_char == "/": return self._create_token_at_position(tokens.SLASH, "/")            
+        if self._current_char == "/":
+            return self._create_token_at_position(tokens.SLASH, "/")
 
         # Dot (.)
-        if self._current_char == ".": return self._create_token_at_position(tokens.DOT, ".")            
+        if self._current_char == ".":
+            return self._create_token_at_position(tokens.DOT, ".")
 
         # Comma (,)
-        if self._current_char == ",": return self._create_token_at_position(tokens.COMMA, ",")            
+        if self._current_char == ",":
+            return self._create_token_at_position(tokens.COMMA, ",")
 
         # Colon (:)
-        if self._current_char == ":": return self._create_token_at_position(tokens.COLON, ".")            
+        if self._current_char == ":":
+            return self._create_token_at_position(tokens.COLON, ".")
 
         # Hash (#)
-        if self._current_char == "#": return self._create_token_at_position(tokens.HASH, "#")            
+        if self._current_char == "#":
+            return self._create_token_at_position(tokens.HASH, "#")
 
         # Equal (=)
-        if self._current_char == "=": return self._create_token_at_position(tokens.EQUAL, "=")            
+        if self._current_char == "=":
+            return self._create_token_at_position(tokens.EQUAL, "=")
 
         # Less (<)
-        if self._current_char == "<": return self._create_token_at_position(tokens.LESS, "<")            
+        if self._current_char == "<":
+            return self._create_token_at_position(tokens.LESS, "<")
 
         # Greater (>)
-        if self._current_char == ">": return self._create_token_at_position(tokens.GREATER, ">")            
+        if self._current_char == ">":
+            return self._create_token_at_position(tokens.GREATER, ">")
 
         # Left brace (()
-        if self._current_char == "(": return self._create_token_at_position(tokens.LEFT_BRACE, "(")            
+        if self._current_char == "(":
+            return self._create_token_at_position(tokens.LEFT_BRACE, "(")
 
         # Right brace ())
-        if self._current_char == ")": return self._create_token_at_position(tokens.RIGHT_BRACE, ")")            
-        
+        if self._current_char == ")":
+            return self._create_token_at_position(tokens.RIGHT_BRACE, ")")
+
         # Left square brace ([)
-        if self._current_char == "[": return self._create_token_at_position(tokens.LEFT_SQUARE_BRACE, "[")            
+        if self._current_char == "[":
+            return self._create_token_at_position(tokens.LEFT_SQUARE_BRACE, "[")
 
         # Right square brace (])
-        if self._current_char == "]": return self._create_token_at_position(tokens.RIGHT_SQUARE_BRACE, "]")            
+        if self._current_char == "]":
+            return self._create_token_at_position(tokens.RIGHT_SQUARE_BRACE, "]")
 
         # Left curly brace ({)
-        if self._current_char == "{": return self._create_token_at_position(tokens.LEFT_CURLY_BRACE, "{")            
+        if self._current_char == "{":
+            return self._create_token_at_position(tokens.LEFT_CURLY_BRACE, "{")
 
         # Right curly brace (})
-        if self._current_char == "}": return self._create_token_at_position(tokens.RIGHT_CURLY_BRACE, "}")            
+        if self._current_char == "}":
+            return self._create_token_at_position(tokens.RIGHT_CURLY_BRACE, "}")
 
-        return Token(tokens.ERROR_TOKEN, "Unknown character sequence!", self._line_number, self._column)
+        return Token(tokens.ERROR_TOKEN, "Unknown character sequence!",
+                     self._line_number, self._column)
 
     def _advance(self):
         self._pos += 1
@@ -116,7 +143,7 @@ class Lexer:
         self._line_number += 1
         return Token(tokens.END_OF_FILE, None, self._line_number, self._column)
 
-    def _end_of_line(self):      
+    def _end_of_line(self):
         token = Token(tokens.NEWLINE, os.linesep, self._line_number, self._column)
 
         self._advance()
@@ -150,7 +177,8 @@ class Lexer:
         value = ""
         while True:
             if self._current_char is None or self._current_char == os.linesep:
-                self._error = Token(tokens.ERROR_TOKEN, "Unexpected newline!", self._line_number, self._column)
+                self._error = Token(tokens.ERROR_TOKEN, "Unexpected newline!",
+                                    self._line_number, self._column)
                 return value
 
             if self._current_char in terminater:
@@ -164,33 +192,37 @@ class Lexer:
         start = self._column
         self._advance()
 
-        return Token(tokens.STRING, self._read_until(["\""]), self._line_number, start)
+        return Token(tokens.STRING, self._read_until(["\""]),
+                     self._line_number, start)
 
     def _name(self):
         start = self._column
         name = ""
-        while self._current_char is not None and self._current_char != os.linesep and self._current_char in CHARACHTERS_NAME:
+        while (self._current_char is not None and
+               self._current_char != os.linesep and
+               self._current_char in CHARACHTERS_NAME):
             name += self._current_char
             self._advance()
 
         return Token(tokens.NAME, name, self._line_number, start)
-    
+
     def _number(self):
         start = self._column
 
         if self._current_char == "'":
-            self._advance()           
+            self._advance()
 
             if self._current_char in ["H", "h"]:
                 self._advance()
-                base = 16                
+                base = 16
 
             if self._current_char in ["B", "b"]:
                 self._advance()
                 base = 2
 
             value = self._read_until("'")
-            return Token(tokens.INTEGER, int(value, base), self._line_number, start)
+            return Token(tokens.INTEGER, int(value, base),
+                         self._line_number, start)
 
     def _create_token_at_position(self, token_type, value):
         self._advance()

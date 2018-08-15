@@ -3,4 +3,4 @@
 
 from .token import Token
 from .krlgrammar import tokens
-from .lexer import Lexer 
+from .lexer import Lexer
