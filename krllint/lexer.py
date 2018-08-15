@@ -212,6 +212,7 @@ class Lexer:
         if self._current_char == "'":
             self._advance()
 
+            base = 10
             if self._current_char in ["H", "h"]:
                 base = 16
 
@@ -228,6 +229,17 @@ class Lexer:
                 return Token(tokens.ERROR_TOKEN, "Invalid syntax!",
                              self._line_number, start)
 
+        value = ""
+        while (self._current_char is not None and
+               self._current_char != os.linesep and
+               not self._current_char.isspace()):
+            value += self._current_char
+            self._advance()
+
+        if any((char in ["E", "e", "."]) for char in value):
+            return Token(tokens.REAL, float(value), self._line_number, start)
+
+        return Token(tokens.INTEGER, int(value), self._line_number, start)
 
     def _create_token_at_position(self, token_type, value):
         self._advance()

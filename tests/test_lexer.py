@@ -52,3 +52,20 @@ class LexerTestCase(TestCase):
     def test_bin_digit(self):
         lexer = Lexer("'B1010")
         self.assertEqual(Token(tokens.INTEGER, int("1010", 2), 0, 0), lexer.get_next_token())
+
+    def test_integer(self):
+        lexer = Lexer("12345")
+        self.assertEqual(Token(tokens.INTEGER, 12345, 0, 0), lexer.get_next_token())
+
+    def test_real(self):
+        lexer = Lexer("1.1")
+        self.assertEqual(Token(tokens.REAL, 1.1, 0, 0), lexer.get_next_token())
+
+        lexer = Lexer("1E3")
+        self.assertEqual(Token(tokens.REAL, 1E3, 0, 0), lexer.get_next_token())
+
+        lexer = Lexer("1.3E3")
+        self.assertEqual(Token(tokens.REAL, 1.3E3, 0, 0), lexer.get_next_token())
+
+        lexer = Lexer("1.3E-3")
+        self.assertEqual(Token(tokens.REAL, 1.3E-3, 0, 0), lexer.get_next_token())
