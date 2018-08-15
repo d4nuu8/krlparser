@@ -4,4 +4,6 @@ lint:
 
 .PHONY: test
 test:
-	python -m unittest
+	coverage run -m unittest
+	coverage html --omit="tests*/"
+	coverage report --omit="tests*/"
