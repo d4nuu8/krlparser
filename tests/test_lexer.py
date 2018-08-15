@@ -40,3 +40,11 @@ class LexerTestCase(TestCase):
 
         lexer = Lexer("\tNamedTest\t")
         self.assertEqual(Token(tokens.NAME, "NamedTest", 0, 1), lexer.get_next_token())
+
+    def test_hex_digit(self):
+        lexer = Lexer("'H1F")
+        self.assertEqual(Token(tokens.INTEGER, int("1f", 16), 0, 0), lexer.get_next_token())
+
+    def test_bin_digit(self):
+        lexer = Lexer("'B1010")
+        self.assertEqual(Token(tokens.INTEGER, int("1010", 2), 0, 0), lexer.get_next_token())

@@ -8,7 +8,8 @@ from .token import Token
 from .krlgrammar import tokens
 
 FIRST_CHARACTERS_NAME = list(string.ascii_letters) + ["$", "_"]
-CHARACHTERS_NAME      = FIRST_CHARACTERS_NAME + list(string.digits)
+CHARACHTERS_NAME = FIRST_CHARACTERS_NAME + list(string.digits)
+HEX_CHARACTERS = string.ascii_lowercase[:6] + string.ascii_uppercase[:6]
 
 class Lexer:
     def __init__(self, input):
@@ -44,6 +45,9 @@ class Lexer:
 
         # Name
         if self._current_char in FIRST_CHARACTERS_NAME: return self._name()
+
+        # Numbers
+        if self._current_char.isdigit() or self._current_char == "'": return self._number()
 
         # Plus (+)
         if self._current_char == "+": return self._create_token_at_position(tokens.PLUS, "+")            
@@ -142,22 +146,25 @@ class Lexer:
 
         return line
 
+    def _read_until(self, terminater):
+        value = ""
+        while True:
+            if self._current_char is None or self._current_char == os.linesep:
+                self._error = Token(tokens.ERROR_TOKEN, "Unexpected newline!", self._line_number, self._column)
+                return value
+
+            if self._current_char in terminater:
+                self._advance()
+                return value
+
+            value += self._current_char
+            self._advance()
+
     def _string(self):
         start = self._column
         self._advance()
 
-        string = ""
-        while True:
-            if self._current_char is None or self._current_char == os.linesep:
-                self._error = Token(tokens.ERROR_TOKEN, "Multiline string literals are not supported!", self._line_number, self._column)
-                return Token(tokens.STRING, string, self._line_number, start)
-
-            if self._current_char == "\"":
-                self._advance()
-                return Token(tokens.STRING, string, self._line_number, start)
-
-            string += self._current_char
-            self._advance()
+        return Token(tokens.STRING, self._read_until(["\""]), self._line_number, start)
 
     def _name(self):
         start = self._column
@@ -168,6 +175,23 @@ class Lexer:
 
         return Token(tokens.NAME, name, self._line_number, start)
     
+    def _number(self):
+        start = self._column
+
+        if self._current_char == "'":
+            self._advance()           
+
+            if self._current_char in ["H", "h"]:
+                self._advance()
+                base = 16                
+
+            if self._current_char in ["B", "b"]:
+                self._advance()
+                base = 2
+
+            value = self._read_until("'")
+            return Token(tokens.INTEGER, int(value, base), self._line_number, start)
+
     def _create_token_at_position(self, token_type, value):
         self._advance()
         return Token(token_type, value, self._line_number, self._column)
