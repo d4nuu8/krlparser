@@ -13,12 +13,15 @@ HEX_CHARACTERS = string.ascii_lowercase[:6] + string.ascii_uppercase[:6]
 
 class Lexer:
     def __init__(self, input):
+        if input is None or not isinstance(input, str):
+            raise ValueError("Invalid input!")
+
         self._input = input
         self._pos = 0
         self._line_number = 0
         self._column = 0
         self._current_token = None
-        self._current_char = self._input[self._pos]
+        self._current_char = self._input[self._pos] if input else None
         self._error = None
 
     def get_next_token(self):
@@ -37,6 +40,7 @@ class Lexer:
         # Whitespace
         if self._current_char.isspace():
             self._skip_whitespace()
+            return self.get_next_token()
 
         # Comment
         if self._current_char == ";":
@@ -139,8 +143,6 @@ class Lexer:
             self._current_char = self._input[self._pos]
 
     def _end_of_file(self):
-        self._column = 0
-        self._line_number += 1
         return Token(tokens.END_OF_FILE, None, self._line_number, self._column)
 
     def _end_of_line(self):
