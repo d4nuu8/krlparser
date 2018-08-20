@@ -2,5 +2,5 @@
 # -*- coding: utf-8 -*-
 
 from .token import Token
-from .krlgrammar import tokens
+from .krlgrammar import TOKENS
 from .lexer import Lexer

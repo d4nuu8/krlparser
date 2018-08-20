@@ -5,7 +5,7 @@ import os
 import string
 
 from .token import Token
-from .krlgrammar import tokens
+from .krlgrammar import TOKENS
 
 FIRST_CHARACTERS_NAME = list(string.ascii_letters) + ["$", "_"]
 CHARACHTERS_NAME = FIRST_CHARACTERS_NAME + list(string.digits)
@@ -64,73 +64,73 @@ class Lexer:
 
         # Plus (+)
         if self._current_char == "+":
-            return self._create_token_at_position(tokens.PLUS, "+")
+            return self._create_token_at_position(TOKENS.PLUS, "+")
 
         # Minus (-)
         if self._current_char == "-":
-            return self._create_token_at_position(tokens.MINUS, "-")
+            return self._create_token_at_position(TOKENS.MINUS, "-")
 
         # Star (*)
         if self._current_char == "*":
-            return self._create_token_at_position(tokens.STAR, "*")
+            return self._create_token_at_position(TOKENS.STAR, "*")
 
         # Slash (/)
         if self._current_char == "/":
-            return self._create_token_at_position(tokens.SLASH, "/")
+            return self._create_token_at_position(TOKENS.SLASH, "/")
 
         # Dot (.)
         if self._current_char == ".":
-            return self._create_token_at_position(tokens.DOT, ".")
+            return self._create_token_at_position(TOKENS.DOT, ".")
 
         # Comma (,)
         if self._current_char == ",":
-            return self._create_token_at_position(tokens.COMMA, ",")
+            return self._create_token_at_position(TOKENS.COMMA, ",")
 
         # Colon (:)
         if self._current_char == ":":
-            return self._create_token_at_position(tokens.COLON, ".")
+            return self._create_token_at_position(TOKENS.COLON, ".")
 
         # Hash (#)
         if self._current_char == "#":
-            return self._create_token_at_position(tokens.HASH, "#")
+            return self._create_token_at_position(TOKENS.HASH, "#")
 
         # Equal (=)
         if self._current_char == "=":
-            return self._create_token_at_position(tokens.EQUAL, "=")
+            return self._create_token_at_position(TOKENS.EQUAL, "=")
 
         # Less (<)
         if self._current_char == "<":
-            return self._create_token_at_position(tokens.LESS, "<")
+            return self._create_token_at_position(TOKENS.LESS, "<")
 
         # Greater (>)
         if self._current_char == ">":
-            return self._create_token_at_position(tokens.GREATER, ">")
+            return self._create_token_at_position(TOKENS.GREATER, ">")
 
         # Left brace (()
         if self._current_char == "(":
-            return self._create_token_at_position(tokens.LEFT_BRACE, "(")
+            return self._create_token_at_position(TOKENS.LEFT_BRACE, "(")
 
         # Right brace ())
         if self._current_char == ")":
-            return self._create_token_at_position(tokens.RIGHT_BRACE, ")")
+            return self._create_token_at_position(TOKENS.RIGHT_BRACE, ")")
 
         # Left square brace ([)
         if self._current_char == "[":
-            return self._create_token_at_position(tokens.LEFT_SQUARE_BRACE, "[")
+            return self._create_token_at_position(TOKENS.LEFT_SQUARE_BRACE, "[")
 
         # Right square brace (])
         if self._current_char == "]":
-            return self._create_token_at_position(tokens.RIGHT_SQUARE_BRACE, "]")
+            return self._create_token_at_position(TOKENS.RIGHT_SQUARE_BRACE, "]")
 
         # Left curly brace ({)
         if self._current_char == "{":
-            return self._create_token_at_position(tokens.LEFT_CURLY_BRACE, "{")
+            return self._create_token_at_position(TOKENS.LEFT_CURLY_BRACE, "{")
 
         # Right curly brace (})
         if self._current_char == "}":
-            return self._create_token_at_position(tokens.RIGHT_CURLY_BRACE, "}")
+            return self._create_token_at_position(TOKENS.RIGHT_CURLY_BRACE, "}")
 
-        return Token(tokens.ERROR_TOKEN, "Unknown character sequence!",
+        return Token(TOKENS.ERROR_TOKEN, "Unknown character sequence!",
                      self._line_number, self._column)
 
     def _advance(self):
@@ -143,10 +143,10 @@ class Lexer:
             self._current_char = self._input[self._pos]
 
     def _end_of_file(self):
-        return Token(tokens.END_OF_FILE, None, self._line_number, self._column)
+        return Token(TOKENS.END_OF_FILE, None, self._line_number, self._column)
 
     def _end_of_line(self):
-        token = Token(tokens.NEWLINE, os.linesep, self._line_number, self._column)
+        token = Token(TOKENS.NEWLINE, os.linesep, self._line_number, self._column)
 
         self._advance()
         self._column = 0
@@ -159,11 +159,11 @@ class Lexer:
 
     def _comment(self):
         start = self._column
-        return Token(tokens.COMMENT, self._read_line(), self._line_number, start)
+        return Token(TOKENS.COMMENT, self._read_line(), self._line_number, start)
 
     def _file_attribute(self):
         start = self._column
-        return Token(tokens.FILE_ATTRIBUTE, self._read_line(), self._line_number, start)
+        return Token(TOKENS.FILE_ATTRIBUTE, self._read_line(), self._line_number, start)
 
     def _read_line(self):
         self._advance()
@@ -179,7 +179,7 @@ class Lexer:
         value = ""
         while True:
             if self._current_char is None or self._current_char == os.linesep:
-                self._error = Token(tokens.ERROR_TOKEN, "Unexpected newline!",
+                self._error = Token(TOKENS.ERROR_TOKEN, "Unexpected newline!",
                                     self._line_number, self._column)
                 return value
 
@@ -194,7 +194,7 @@ class Lexer:
         start = self._column
         self._advance()
 
-        return Token(tokens.STRING, self._read_until(["\""]),
+        return Token(TOKENS.STRING, self._read_until(["\""]),
                      self._line_number, start)
 
     def _name(self):
@@ -206,7 +206,7 @@ class Lexer:
             name += self._current_char
             self._advance()
 
-        return Token(tokens.NAME, name, self._line_number, start)
+        return Token(TOKENS.NAME, name, self._line_number, start)
 
     def _number(self):
         start = self._column
@@ -225,10 +225,10 @@ class Lexer:
             value = self._read_until("'")
 
             try:
-                return Token(tokens.INTEGER, int(value, base),
+                return Token(TOKENS.INTEGER, int(value, base),
                              self._line_number, start)
             except ValueError:
-                return Token(tokens.ERROR_TOKEN, "Invalid syntax!",
+                return Token(TOKENS.ERROR_TOKEN, "Invalid syntax!",
                              self._line_number, start)
 
         value = ""
@@ -239,9 +239,9 @@ class Lexer:
             self._advance()
 
         if any((char in ["E", "e", "."]) for char in value):
-            return Token(tokens.REAL, float(value), self._line_number, start)
+            return Token(TOKENS.REAL, float(value), self._line_number, start)
 
-        return Token(tokens.INTEGER, int(value), self._line_number, start)
+        return Token(TOKENS.INTEGER, int(value), self._line_number, start)
 
     def _create_token_at_position(self, token_type, value):
         self._advance()
