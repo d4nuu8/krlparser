@@ -22,12 +22,22 @@ class Lexer:
         self._column = 0
         self._current_token = None
         self._current_char = self._input[self._pos] if input else None
-        self._error = None
+        self._error = []
 
-    def get_next_token(self):
+    def generate_tokens(self):
+        token_list = []
+
+        while True:
+            next_token = self._get_next_token()
+            token_list.append(next_token)
+
+            if next_token.token_type == TOKENS.END_OF_FILE:
+                return token_list
+
+    def _get_next_token(self):
         # Error
-        if self._error is not None:
-            return self._error
+        if self._error:
+            return self._error.pop(0)
 
         # End of file (EOF)
         if self._current_char is None:
@@ -40,7 +50,7 @@ class Lexer:
         # Whitespace
         if self._current_char.isspace():
             self._skip_whitespace()
-            return self.get_next_token()
+            return self._get_next_token()
 
         # Comment
         if self._current_char == ";":
@@ -179,8 +189,8 @@ class Lexer:
         value = ""
         while True:
             if self._current_char is None or self._current_char == os.linesep:
-                self._error = Token(TOKENS.ERROR_TOKEN, "Unexpected newline!",
-                                    self._line_number, self._column)
+                self._error.append(Token(TOKENS.ERROR_TOKEN, "Unexpected newline!",
+                                         self._line_number, self._column))
                 return value
 
             if self._current_char in terminater:
