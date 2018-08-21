@@ -98,7 +98,7 @@ class Lexer:
 
         # Colon (:)
         if self._current_char == ":":
-            return self._create_token_at_position(TOKENS.COLON, ".")
+            return self._create_token_at_position(TOKENS.COLON, ":")
 
         # Hash (#)
         if self._current_char == "#":
@@ -140,6 +140,7 @@ class Lexer:
         if self._current_char == "}":
             return self._create_token_at_position(TOKENS.RIGHT_CURLY_BRACE, "}")
 
+        self._advance()
         return Token(TOKENS.ERROR_TOKEN, "Unknown character sequence!",
                      self._line_number, self._column)
 
@@ -254,5 +255,6 @@ class Lexer:
         return Token(TOKENS.INTEGER, int(value), self._line_number, start)
 
     def _create_token_at_position(self, token_type, value):
+        token = Token(token_type, value, self._line_number, self._column)
         self._advance()
-        return Token(token_type, value, self._line_number, self._column)
+        return token
