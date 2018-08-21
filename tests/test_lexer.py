@@ -10,10 +10,10 @@ from krllint.krlgrammar import TOKENS
 class LexerTestCase(TestCase):
     def test_invalid_input(self):
         with self.assertRaises(ValueError):
-            lexer = Lexer(None)
+            Lexer(None)
 
         with self.assertRaises(ValueError):
-            lexer = Lexer(0)
+            Lexer(0)
 
     def test_unknown_input(self):
         lexer = Lexer("~foo")
