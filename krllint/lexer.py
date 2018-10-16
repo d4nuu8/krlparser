@@ -7,21 +7,46 @@ import string
 from .token import Token
 from .krlgrammar import TOKENS
 
-FIRST_CHARACTERS_NAME = list(string.ascii_letters) + ["$", "_"]
-CHARACHTERS_NAME = FIRST_CHARACTERS_NAME + list(string.digits)
-HEX_CHARACTERS = string.ascii_lowercase[:6] + string.ascii_uppercase[:6]
 
 class Lexer:
-    def __init__(self, input):
-        if input is None or not isinstance(input, str):
+    FIRST_CHARACTERS_NAME = list(string.ascii_letters) + ["$", "_"]
+
+    CHARACHTERS_NAME = FIRST_CHARACTERS_NAME + list(string.digits)
+
+    HEX_CHARACTERS = string.ascii_lowercase[:6] + string.ascii_uppercase[:6]
+
+    OPERATORS = {
+        "+" : TOKENS.PLUS,
+        "-" : TOKENS.MINUS,
+        "*" : TOKENS.STAR,
+        "/" : TOKENS.SLASH,
+        "." : TOKENS.DOT,
+        "," : TOKENS.COMMA,
+        ":" : TOKENS.COLON,
+        "#" : TOKENS.HASH,
+        "=" : TOKENS.EQUAL,
+        "==" : TOKENS.EQUAL_EQUAL,
+        "<" : TOKENS.LESS,
+        ">" : TOKENS.GREATER,
+        "(" : TOKENS.LEFT_BRACE,
+        ")" : TOKENS.RIGHT_BRACE,
+        "[" : TOKENS.LEFT_SQUARE_BRACE,
+        "]" : TOKENS.RIGHT_SQUARE_BRACE,
+        "{" : TOKENS.LEFT_CURLY_BRACE,
+        "}" : TOKENS.RIGHT_CURLY_BRACE
+    }
+
+
+    def __init__(self, code):
+        if code is None or not isinstance(code, str):
             raise ValueError("Invalid input!")
 
-        self._input = input
+        self._input = code
         self._pos = 0
         self._line_number = 0
         self._column = 0
         self._current_token = None
-        self._current_char = self._input[self._pos] if input else None
+        self._current_char = self._input[self._pos] if code else None
         self._error = []
 
     def generate_tokens(self):
@@ -35,114 +60,57 @@ class Lexer:
                 return token_list
 
     def _get_next_token(self):
+        token = None
+
         # Error
         if self._error:
-            return self._error.pop(0)
+            token = self._error.pop(0)
 
         # End of file (EOF)
-        if self._current_char is None:
-            return self._end_of_file()
+        elif self._current_char is None:
+            token = self._end_of_file()
 
         # End of line (EOL)
-        if self._current_char == os.linesep:
-            return self._end_of_line()
+        elif self._current_char == os.linesep:
+            token = self._end_of_line()
 
         # Whitespace
-        if self._current_char.isspace():
+        elif self._current_char.isspace():
             self._skip_whitespace()
-            return self._get_next_token()
+            token = self._get_next_token()
 
         # Comment
-        if self._current_char == ";":
-            return self._comment()
+        elif self._current_char == ";":
+            token = self._comment()
 
         # File attribute
-        if self._current_char == "&":
-            return self._file_attribute()
+        elif self._current_char == "&":
+            token = self._file_attribute()
 
         # String
-        if self._current_char == "\"":
-            return self._string()
+        elif self._current_char == "\"":
+            token = self._string()
 
         # Name
-        if self._current_char in FIRST_CHARACTERS_NAME:
-            return self._name()
+        elif self._current_char in self.FIRST_CHARACTERS_NAME:
+            token = self._name()
 
         # Numbers
-        if self._current_char.isdigit() or self._current_char == "'":
-            return self._number()
+        elif self._current_char.isdigit() or self._current_char == "'":
+            token = self._number()
 
-        # Plus (+)
-        if self._current_char == "+":
-            return self._create_token_at_position(TOKENS.PLUS, "+")
+        # Operators
+        elif self._is_operator():
+            token = self.OPERATORS[self._current_char]
+            return self._create_token_at_position(token, self._current_char)
 
-        # Minus (-)
-        if self._current_char == "-":
-            return self._create_token_at_position(TOKENS.MINUS, "-")
+        # Error
+        else:
+            self._advance()
+            token = Token(TOKENS.ERROR_TOKEN, "Unknown character sequence!",
+                          self._line_number, self._column)
 
-        # Star (*)
-        if self._current_char == "*":
-            return self._create_token_at_position(TOKENS.STAR, "*")
-
-        # Slash (/)
-        if self._current_char == "/":
-            return self._create_token_at_position(TOKENS.SLASH, "/")
-
-        # Dot (.)
-        if self._current_char == ".":
-            return self._create_token_at_position(TOKENS.DOT, ".")
-
-        # Comma (,)
-        if self._current_char == ",":
-            return self._create_token_at_position(TOKENS.COMMA, ",")
-
-        # Colon (:)
-        if self._current_char == ":":
-            return self._create_token_at_position(TOKENS.COLON, ":")
-
-        # Hash (#)
-        if self._current_char == "#":
-            return self._create_token_at_position(TOKENS.HASH, "#")
-
-        # Equal (=)
-        if self._current_char == "=":
-            return self._create_token_at_position(TOKENS.EQUAL, "=")
-
-        # Less (<)
-        if self._current_char == "<":
-            return self._create_token_at_position(TOKENS.LESS, "<")
-
-        # Greater (>)
-        if self._current_char == ">":
-            return self._create_token_at_position(TOKENS.GREATER, ">")
-
-        # Left brace (()
-        if self._current_char == "(":
-            return self._create_token_at_position(TOKENS.LEFT_BRACE, "(")
-
-        # Right brace ())
-        if self._current_char == ")":
-            return self._create_token_at_position(TOKENS.RIGHT_BRACE, ")")
-
-        # Left square brace ([)
-        if self._current_char == "[":
-            return self._create_token_at_position(TOKENS.LEFT_SQUARE_BRACE, "[")
-
-        # Right square brace (])
-        if self._current_char == "]":
-            return self._create_token_at_position(TOKENS.RIGHT_SQUARE_BRACE, "]")
-
-        # Left curly brace ({)
-        if self._current_char == "{":
-            return self._create_token_at_position(TOKENS.LEFT_CURLY_BRACE, "{")
-
-        # Right curly brace (})
-        if self._current_char == "}":
-            return self._create_token_at_position(TOKENS.RIGHT_CURLY_BRACE, "}")
-
-        self._advance()
-        return Token(TOKENS.ERROR_TOKEN, "Unknown character sequence!",
-                     self._line_number, self._column)
+        return token
 
     def _advance(self):
         self._pos += 1
@@ -152,6 +120,9 @@ class Lexer:
             self._current_char = None
         else:
             self._current_char = self._input[self._pos]
+
+    def _is_operator(self):
+        return self._current_char in self.OPERATORS
 
     def _end_of_file(self):
         return Token(TOKENS.END_OF_FILE, None, self._line_number, self._column)
@@ -213,7 +184,7 @@ class Lexer:
         name = ""
         while (self._current_char is not None and
                self._current_char != os.linesep and
-               self._current_char in CHARACHTERS_NAME):
+               self._current_char in self.CHARACHTERS_NAME):
             name += self._current_char
             self._advance()
 
