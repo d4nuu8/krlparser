@@ -8,33 +8,41 @@ from .token import Token
 from .krlgrammar import TOKENS
 
 
-class Lexer:
+class Lexer: # pylint: disable=too-few-public-methods
     FIRST_CHARACTERS_NAME = list(string.ascii_letters) + ["$", "_"]
 
     CHARACHTERS_NAME = FIRST_CHARACTERS_NAME + list(string.digits)
 
     HEX_CHARACTERS = string.ascii_lowercase[:6] + string.ascii_uppercase[:6]
 
-    OPERATORS = {
-        "+" : TOKENS.PLUS,
-        "-" : TOKENS.MINUS,
-        "*" : TOKENS.STAR,
-        "/" : TOKENS.SLASH,
-        "." : TOKENS.DOT,
-        "," : TOKENS.COMMA,
-        ":" : TOKENS.COLON,
-        "#" : TOKENS.HASH,
-        "=" : TOKENS.EQUAL,
-        "==" : TOKENS.EQUAL_EQUAL,
-        "<" : TOKENS.LESS,
-        ">" : TOKENS.GREATER,
-        "(" : TOKENS.LEFT_BRACE,
-        ")" : TOKENS.RIGHT_BRACE,
-        "[" : TOKENS.LEFT_SQUARE_BRACE,
-        "]" : TOKENS.RIGHT_SQUARE_BRACE,
-        "{" : TOKENS.LEFT_CURLY_BRACE,
-        "}" : TOKENS.RIGHT_CURLY_BRACE
-    }
+    @property
+    def _token_mapping(self):
+        def operator(token):
+            return self._create_token_at_position(token, self._current_char)
+
+        return {
+            ";": self._comment,
+            "&": self._file_attribute,
+            "\"": self._string,
+            "+": lambda: operator(TOKENS.PLUS),
+            "-": lambda: operator(TOKENS.MINUS),
+            "*": lambda: operator(TOKENS.STAR),
+            "/": lambda: operator(TOKENS.SLASH),
+            ".": lambda: operator(TOKENS.DOT),
+            ",": lambda: operator(TOKENS.COMMA),
+            ":": lambda: operator(TOKENS.COLON),
+            "#": lambda: operator(TOKENS.HASH),
+            "=": lambda: operator(TOKENS.EQUAL),
+            "==": lambda: operator(TOKENS.EQUAL_EQUAL),
+            "<": lambda: operator(TOKENS.LESS),
+            ">": lambda: operator(TOKENS.GREATER),
+            "(": lambda: operator(TOKENS.LEFT_BRACE),
+            ")": lambda: operator(TOKENS.RIGHT_BRACE),
+            "[": lambda: operator(TOKENS.LEFT_SQUARE_BRACE),
+            "]": lambda: operator(TOKENS.RIGHT_SQUARE_BRACE),
+            "{": lambda: operator(TOKENS.LEFT_CURLY_BRACE),
+            "}": lambda: operator(TOKENS.RIGHT_CURLY_BRACE)
+        }
 
 
     def __init__(self, code):
@@ -79,18 +87,6 @@ class Lexer:
             self._skip_whitespace()
             token = self._get_next_token()
 
-        # Comment
-        elif self._current_char == ";":
-            token = self._comment()
-
-        # File attribute
-        elif self._current_char == "&":
-            token = self._file_attribute()
-
-        # String
-        elif self._current_char == "\"":
-            token = self._string()
-
         # Name
         elif self._current_char in self.FIRST_CHARACTERS_NAME:
             token = self._name()
@@ -99,18 +95,20 @@ class Lexer:
         elif self._current_char.isdigit() or self._current_char == "'":
             token = self._number()
 
-        # Operators
-        elif self._is_operator():
-            token = self.OPERATORS[self._current_char]
-            return self._create_token_at_position(token, self._current_char)
+        else:
+            try:
+                token = self._token_mapping[self._current_char]()
+            except KeyError:
+                pass
+
+        if token:
+            return token
 
         # Error
-        else:
-            self._advance()
-            token = Token(TOKENS.ERROR_TOKEN, "Unknown character sequence!",
-                          self._line_number, self._column)
+        self._advance()
+        return Token(TOKENS.ERROR_TOKEN, "Unknown character sequence!",
+                     self._line_number, self._column)
 
-        return token
 
     def _advance(self):
         self._pos += 1
@@ -120,9 +118,6 @@ class Lexer:
             self._current_char = None
         else:
             self._current_char = self._input[self._pos]
-
-    def _is_operator(self):
-        return self._current_char in self.OPERATORS
 
     def _end_of_file(self):
         return Token(TOKENS.END_OF_FILE, None, self._line_number, self._column)
