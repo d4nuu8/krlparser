@@ -3,9 +3,9 @@
 
 from unittest import TestCase
 
-from krllint import Lexer
-from krllint.token import Token
-from krllint.krlgrammar import TOKENS
+from krlparser import Lexer
+from krlparser.token import Token
+from krlparser.krlgrammar import TOKENS
 
 class LexerTestCase(TestCase):
     def test_invalid_input(self):
