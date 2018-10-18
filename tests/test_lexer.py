@@ -19,7 +19,7 @@ class LexerTestCase(TestCase):
         lexer = Lexer("~foo")
         tokens = lexer.generate_tokens()
         self.assertEqual(TOKENS.ERROR_TOKEN, tokens[0].token_type)
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 1), tokens[1])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 1), tokens[1])
 
     def test_comment(self):
         lexer = Lexer(";Test")
@@ -48,19 +48,27 @@ class LexerTestCase(TestCase):
         tokens = lexer.generate_tokens()
         self.assertEqual(Token(TOKENS.FILE_ATTRIBUTE, "Test", 0, 0), tokens[0])
 
-    def test_name(self):
-        lexer = Lexer("NamedTest")
-        tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "NamedTest", 0, 0), tokens[0])
+    def test_keyword(self):
+        keywords = ["GLOBAL", "DEF", "END" ]
+        for keyword in keywords:
+            with self.subTest():
+                lexer = Lexer(keyword)
+                tokens = lexer.generate_tokens()
+                self.assertEqual(Token(keyword, keyword, 0, 0), tokens[0])
 
-    def test_name_with_whitespaces(self):
-        lexer = Lexer("   NamedTest   ")
+    def test_ID(self):
+        lexer = Lexer("IDdTest")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "NamedTest", 0, 3), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "IDdTest", 0, 0), tokens[0])
 
-        lexer = Lexer("\tNamedTest\t")
+    def test_ID_with_whitespaces(self):
+        lexer = Lexer("   IDdTest   ")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "NamedTest", 0, 1), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "IDdTest", 0, 3), tokens[0])
+
+        lexer = Lexer("\tIDdTest\t")
+        tokens = lexer.generate_tokens()
+        self.assertEqual(Token(TOKENS.ID, "IDdTest", 0, 1), tokens[0])
 
     def test_hex_digit(self):
         lexer = Lexer("'H1F")
@@ -132,69 +140,69 @@ class LexerTestCase(TestCase):
     def test_structure_access(self):
         lexer = Lexer("foo.bar")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 0), tokens[0])
         self.assertEqual(Token(TOKENS.DOT, ".", 0, 3), tokens[1])
-        self.assertEqual(Token(TOKENS.NAME, "bar", 0, 4), tokens[2])
+        self.assertEqual(Token(TOKENS.ID, "bar", 0, 4), tokens[2])
 
     def test_function_call(self):
         lexer = Lexer("Test(foo, bar)")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "Test", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "Test", 0, 0), tokens[0])
         self.assertEqual(Token(TOKENS.LEFT_BRACE, "(", 0, 4), tokens[1])
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 5), tokens[2])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 5), tokens[2])
         self.assertEqual(Token(TOKENS.COMMA, ",", 0, 8), tokens[3])
-        self.assertEqual(Token(TOKENS.NAME, "bar", 0, 10), tokens[4])
+        self.assertEqual(Token(TOKENS.ID, "bar", 0, 10), tokens[4])
         self.assertEqual(Token(TOKENS.RIGHT_BRACE, ")", 0, 13), tokens[5])
 
     def test_greater_than(self):
         lexer = Lexer("foo > bar")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 0), tokens[0])
         self.assertEqual(Token(TOKENS.GREATER, ">", 0, 4), tokens[1])
-        self.assertEqual(Token(TOKENS.NAME, "bar", 0, 6), tokens[2])
+        self.assertEqual(Token(TOKENS.ID, "bar", 0, 6), tokens[2])
 
     def test_less_than(self):
         lexer = Lexer("foo < bar")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 0), tokens[0])
         self.assertEqual(Token(TOKENS.LESS, "<", 0, 4), tokens[1])
-        self.assertEqual(Token(TOKENS.NAME, "bar", 0, 6), tokens[2])
+        self.assertEqual(Token(TOKENS.ID, "bar", 0, 6), tokens[2])
 
     def test_assign(self):
         lexer = Lexer("foo = bar")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 0), tokens[0])
         self.assertEqual(Token(TOKENS.EQUAL, "=", 0, 4), tokens[1])
-        self.assertEqual(Token(TOKENS.NAME, "bar", 0, 6), tokens[2])
+        self.assertEqual(Token(TOKENS.ID, "bar", 0, 6), tokens[2])
 
     def test_geometric_shift(self):
         lexer = Lexer("foo : bar")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 0), tokens[0])
         self.assertEqual(Token(TOKENS.COLON, ":", 0, 4), tokens[1])
-        self.assertEqual(Token(TOKENS.NAME, "bar", 0, 6), tokens[2])
+        self.assertEqual(Token(TOKENS.ID, "bar", 0, 6), tokens[2])
 
     def test_array_access(self):
         lexer = Lexer("foo[bar]")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 0), tokens[0])
         self.assertEqual(Token(TOKENS.LEFT_SQUARE_BRACE, "[", 0, 3), tokens[1])
-        self.assertEqual(Token(TOKENS.NAME, "bar", 0, 4), tokens[2])
+        self.assertEqual(Token(TOKENS.ID, "bar", 0, 4), tokens[2])
         self.assertEqual(Token(TOKENS.RIGHT_SQUARE_BRACE, "]", 0, 7), tokens[3])
 
     def test_enum_access(self):
         lexer = Lexer("foo = #bar")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 0), tokens[0])
         self.assertEqual(Token(TOKENS.EQUAL, "=", 0, 4), tokens[1])
         self.assertEqual(Token(TOKENS.HASH, "#", 0, 6), tokens[2])
-        self.assertEqual(Token(TOKENS.NAME, "bar", 0, 7), tokens[3])
+        self.assertEqual(Token(TOKENS.ID, "bar", 0, 7), tokens[3])
 
     def test_structure_declaration(self):
         lexer = Lexer("foo = { bar }")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.NAME, "foo", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.ID, "foo", 0, 0), tokens[0])
         self.assertEqual(Token(TOKENS.EQUAL, "=", 0, 4), tokens[1])
         self.assertEqual(Token(TOKENS.LEFT_CURLY_BRACE, "{", 0, 6), tokens[2])
-        self.assertEqual(Token(TOKENS.NAME, "bar", 0, 8), tokens[3])
+        self.assertEqual(Token(TOKENS.ID, "bar", 0, 8), tokens[3])
         self.assertEqual(Token(TOKENS.RIGHT_CURLY_BRACE, "}", 0, 12), tokens[4])

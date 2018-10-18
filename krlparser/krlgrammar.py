@@ -1,8 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+src_file: (mod_def | fnc_def)+
+mod_def: ("GLOBAL")? "DEF" ID LPAREN attributes RPAREN NEWLINE statements "END"
+fnc_def: ("GLOBAL")? "DEFFCT" type ID LPAREN attributes RPAREN NEWLINE statements "ENDFCT"
+type: NAME
+attribues: TODO
+statements: TODO
+"""
+
+
+class _Keywords:
+    GLOBAL = "GLOBAL"
+    DEF = "DEF"
+    END = "END"
+
+    def __setattr__(self, *_):
+        raise TypeError("Attribute is readonly!")
+
+KEYWORDS = _Keywords()
+
+
 class _Tokens:
-    NAME = "NAME"
+    ID = "ID"
     STRING = "STRING"
     INTEGER = "INTEGER"
     REAL = "REAL"

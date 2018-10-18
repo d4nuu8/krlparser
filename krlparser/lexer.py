@@ -5,13 +5,13 @@ import os
 import string
 
 from .token import Token
-from .krlgrammar import TOKENS
+from .krlgrammar import TOKENS, KEYWORDS
 
 
 class Lexer: # pylint: disable=too-few-public-methods
-    FIRST_CHARACTERS_NAME = list(string.ascii_letters) + ["$", "_"]
+    FIRST_CHARACTERS_ID = list(string.ascii_letters) + ["$", "_"]
 
-    CHARACHTERS_NAME = FIRST_CHARACTERS_NAME + list(string.digits)
+    CHARACHTERS_ID = FIRST_CHARACTERS_ID + list(string.digits)
 
     HEX_CHARACTERS = string.ascii_lowercase[:6] + string.ascii_uppercase[:6]
 
@@ -88,7 +88,7 @@ class Lexer: # pylint: disable=too-few-public-methods
             token = self._get_next_token()
 
         # Name
-        elif self._current_char in self.FIRST_CHARACTERS_NAME:
+        elif self._current_char in self.FIRST_CHARACTERS_ID:
             token = self._name()
 
         # Numbers
@@ -179,11 +179,14 @@ class Lexer: # pylint: disable=too-few-public-methods
         name = ""
         while (self._current_char is not None and
                self._current_char != os.linesep and
-               self._current_char in self.CHARACHTERS_NAME):
+               self._current_char in self.CHARACHTERS_ID):
             name += self._current_char
             self._advance()
 
-        return Token(TOKENS.NAME, name, self._line_number, start)
+        if name in get_public_attributes(KEYWORDS):
+            return Token(name, name, self._line_number, start)
+
+        return Token(TOKENS.ID, name, self._line_number, start)
 
     def _number(self):
         start = self._column
@@ -224,3 +227,6 @@ class Lexer: # pylint: disable=too-few-public-methods
         token = Token(token_type, value, self._line_number, self._column)
         self._advance()
         return token
+
+def get_public_attributes(object):
+    return (name for name in dir(object) if not name.startswith("_"))
