@@ -9,11 +9,15 @@ class Token:
         self.column = column
 
     def __repr__(self):
-        return "Token({token_type}, {value}, {line_number}, {column})".format(
-            token_type=self.token_type,
-            value=self.value if not isinstance(self.value, str) else "\"" + self.value + "\"",
-            line_number=self.line_number, column=self.column
-        )
+        value = (self.value
+                 if not isinstance(self.value, str)
+                 else "\"" + self.value + "\"")
+
+        return (f"Token("
+                f"{self.token_type},"
+                f"{value},"
+                f"{self.line_number},"
+                f"{self.column})")
 
     def __eq__(self, other):
         return (self.token_type == other.token_type and
