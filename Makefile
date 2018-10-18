@@ -1,6 +1,6 @@
 .PHONY: lint
 lint:
-	pylint -j 0 krlparser tests --output-format=colorized
+	pylint krlparser tests || true
 
 .PHONY: test
 test:
