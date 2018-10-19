@@ -123,7 +123,8 @@ class Lexer: # pylint: disable=too-few-public-methods
         return Token(TOKENS.END_OF_FILE, None, self._line_number, self._column)
 
     def _end_of_line(self):
-        token = Token(TOKENS.NEWLINE, os.linesep, self._line_number, self._column)
+        token = Token(
+            TOKENS.NEWLINE, os.linesep, self._line_number, self._column)
 
         self._advance()
         self._column = 0
@@ -136,17 +137,20 @@ class Lexer: # pylint: disable=too-few-public-methods
 
     def _comment(self):
         start = self._column
-        return Token(TOKENS.COMMENT, self._read_line(), self._line_number, start)
+        return Token(
+            TOKENS.COMMENT, self._read_line(), self._line_number, start)
 
     def _file_attribute(self):
         start = self._column
-        return Token(TOKENS.FILE_ATTRIBUTE, self._read_line(), self._line_number, start)
+        return Token(
+            TOKENS.FILE_ATTRIBUTE, self._read_line(), self._line_number, start)
 
     def _read_line(self):
         self._advance()
 
         line = ""
-        while self._current_char is not None and self._current_char != os.linesep:
+        while (self._current_char is not None and
+               self._current_char != os.linesep):
             line += self._current_char
             self._advance()
 
@@ -156,8 +160,9 @@ class Lexer: # pylint: disable=too-few-public-methods
         value = ""
         while True:
             if self._current_char is None or self._current_char == os.linesep:
-                self._error.append(Token(TOKENS.ERROR_TOKEN, "Unexpected newline!",
-                                         self._line_number, self._column))
+                token = Token(TOKENS.ERROR_TOKEN, "Unexpected newline!",
+                              self._line_number, self._column)
+                self._error.append(token)
                 return value
 
             if self._current_char in terminater:
@@ -228,5 +233,5 @@ class Lexer: # pylint: disable=too-few-public-methods
         self._advance()
         return token
 
-def get_public_attributes(object):
-    return (name for name in dir(object) if not name.startswith("_"))
+def get_public_attributes(target):
+    return (name for name in dir(target) if not name.startswith("_"))
