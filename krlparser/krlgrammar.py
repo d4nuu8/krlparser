@@ -3,9 +3,15 @@
 
 """
 src_file: (mod_def | fnc_def)+
-mod_def: (GLOBAL)? DEF ID LPAREN parameters RPAREN NEWLINE END
-fnc_def: (GLOBAL)? DEFFCT ID ID LPAREN parameters RPAREN NEWLINE END
+
+mod_def: NEWLINE* (GLOBAL)? DEF ID LPAREN parameters RPAREN NEWLINE*
+         END NEWLINE*
+
+fnc_def: NEWLINE* (GLOBAL)? DEFFCT ID ID LPAREN parameters RPAREN NEWLINE*
+         END NEWLINE*
+
 parameters: (parameter (COMMA parameter)*)*
+
 parameter: ID COLON (IN | OUT)
 """
 
