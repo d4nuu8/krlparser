@@ -4,11 +4,16 @@
 """
 src_file: (mod_def | fnc_def)+
 
+dat_file: dat_def
+
 mod_def: NEWLINE* GLOBAL? DEF ID LPAREN parameters RPAREN NEWLINE*
          END NEWLINE*
 
 fnc_def: NEWLINE* GLOBAL? DEFFCT ID ID LPAREN parameters RPAREN NEWLINE*
          END NEWLINE*
+
+dat_def: NEWLINE* DEFDAT ID PUBLIC? NEWLINE*
+         ENDDAT NEWLINE*
 
 parameters: (parameter (COMMA parameter)*)*
 
@@ -18,12 +23,15 @@ parameter: ID COLON (IN | OUT)
 
 class _Keywords:
     GLOBAL = "GLOBAL"
+    PUBLIC = "PUBLIC"
     DEF = "DEF"
     DEFFCT = "DEFFCT"
+    DEFDAT = "DEFDAT"
     IN = "IN"
     OUT = "OUT"
     END = "END"
     ENDFCT = "ENDFCT"
+    ENDDAT = "ENDDAT"
 
     def __setattr__(self, *_):
         raise TypeError("Attribute is readonly!")

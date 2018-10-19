@@ -4,7 +4,8 @@
 from unittest import TestCase
 
 from krlparser import Lexer, Parser
-from krlparser.ast import FunctionDefinition, Parameter, Type
+from krlparser.parser import InputType
+from krlparser.ast import FunctionDefinition, Parameter, Type, Scope
 
 class ParserTestCase(TestCase):
     def test_mod_def(self):
@@ -27,7 +28,7 @@ class ParserTestCase(TestCase):
             FunctionDefinition("Bar", None, None, None)
         ]
 
-        self._generic_test(test_input, awaited_result)
+        self._generic_test(InputType.SRC, test_input, awaited_result)
 
     def test_fnc_def(self):
         test_input = (
@@ -49,11 +50,24 @@ class ParserTestCase(TestCase):
             FunctionDefinition("Bar", None, None, Type("REAL"))
         ]
 
-        self._generic_test(test_input, awaited_result)
+        self._generic_test(InputType.SRC, test_input, awaited_result)
 
-    def _generic_test(self, test_input, awaited_result):
+    def test_dat_def(self):
+        test_input = (
+            "DEFDAT Foo PUBLIC\n"
+            "\n"
+            "ENDDAT"
+        )
+
+        awaited_result = [
+            Scope("Foo")
+        ]
+
+        self._generic_test(InputType.DAT, test_input, awaited_result)
+
+    def _generic_test(self, input_type, test_input, awaited_result):
         lexer = Lexer(test_input)
         parser = Parser(lexer)
-        parser.parse()
+        parser.parse(input_type)
         result = parser.ast
         self.assertEqual(awaited_result, result)

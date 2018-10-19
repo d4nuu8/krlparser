@@ -4,6 +4,7 @@
 from abc import ABC
 from enum import Enum, auto
 
+
 class AST(ABC):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
@@ -45,6 +46,7 @@ class Parameter(AST):
         IN = auto()
         OUT = auto()
 
+
 class Type(AST):
     def __init__(self, name):
         super().__init__()
@@ -53,3 +55,10 @@ class Type(AST):
 
     def __repr__(self):
         return f"Type({self.name})"
+
+
+class Scope(AST):
+    def __init__(self, name):
+        super().__init__()
+
+        self.name = name

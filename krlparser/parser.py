@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from enum import Enum, auto
 from .krlgrammar import TOKENS, KEYWORDS
-from .ast import FunctionDefinition, Parameter, Type
+from .ast import FunctionDefinition, Parameter, Type, Scope
 
 
 class ParsingError(Exception):
@@ -12,6 +13,12 @@ class ParsingError(Exception):
         self.line_number = line_number
         self.column = column
         self.message = message
+
+
+class InputType(Enum):
+    SRC = auto()
+    SUB = auto()
+    DAT = auto()
 
 
 class Parser:
@@ -25,8 +32,11 @@ class Parser:
     def ast(self):
         return self._ast
 
-    def parse(self):
-        self._src_file()
+    def parse(self, input_type):
+        if input_type in (InputType.SRC, InputType.SUB):
+            self._src_file()
+        elif input_type == InputType.DAT:
+            self._dat_file()
 
     def _error(self, message):
         token = self._current_token
@@ -73,6 +83,9 @@ class Parser:
                   (KEYWORDS.GLOBAL, KEYWORDS.DEF, KEYWORDS.DEFFCT)):
             self._mod_def()
             self._fnc_def()
+
+    def _dat_file(self):
+        self._dat_def()
 
     def _mod_def(self):
         self._skip_newlines()
@@ -121,6 +134,22 @@ class Parser:
                                    None, Type(return_type.value)))
 
             self._skip_newlines()
+
+    def _dat_def(self):
+        self._skip_newlines()
+
+        self._eat(KEYWORDS.DEFDAT)
+        name = self._eat(TOKENS.ID)
+        public_definition = self._try_eat(KEYWORDS.PUBLIC)
+        self._eat(TOKENS.NEWLINE)
+
+        self._skip_newlines()
+
+        self._eat(KEYWORDS.ENDDAT)
+
+        self._ast.append(Scope(name.value))
+
+        self._skip_newlines()
 
     def _parameters(self):
         if not self._is_current_token(TOKENS.ID):
