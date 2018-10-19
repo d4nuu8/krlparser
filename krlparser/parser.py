@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from .krlgrammar import TOKENS, KEYWORDS
-from .ast import FunctionDefinition, Parameter
+from .ast import FunctionDefinition, Parameter, Type
 
 
 class ParsingError(Exception):
     def __init__(self, line_number, column, message):
-        super().__init__()
+        super().__init__(message)
 
         self.line_number = line_number
         self.column = column
@@ -27,6 +27,10 @@ class Parser:
 
     def parse(self):
         self._mod_def()
+        self._fnc_def()
+
+        if not self._ast:
+            raise self._error("No module or function definition found")
 
     def _error(self, message):
         token = self._current_token
@@ -38,8 +42,7 @@ class Parser:
             self._advance()
             return token
 
-        raise self._error(
-            f"Expected \"{token_type}\", found \"{token.token_type}\"")
+        self._error(f"Expected \"{token_type}\", found \"{token.token_type}\"")
 
     def _try_eat(self, token_type):
         try:
@@ -74,6 +77,24 @@ class Parser:
 
             self._ast.append(
                 FunctionDefinition(name.value, parameters, None, None))
+
+    def _fnc_def(self):
+        global_definition = self._try_eat(KEYWORDS.GLOBAL)
+
+        if self._current_token.token_type == KEYWORDS.DEFFCT:
+            self._eat(KEYWORDS.DEFFCT)
+
+            return_type = self._eat(TOKENS.ID)
+            name = self._eat(TOKENS.ID)
+            self._eat(TOKENS.LEFT_BRACE)
+            parameters = self._parameters()
+            self._eat(TOKENS.RIGHT_BRACE)
+            self._eat(TOKENS.NEWLINE)
+            self._eat(KEYWORDS.ENDFCT)
+
+            self._ast.append(
+                FunctionDefinition(name.value, parameters,
+                                   None, Type(return_type.value)))
 
     def _parameters(self):
         if not self._is_current_token(TOKENS.ID):

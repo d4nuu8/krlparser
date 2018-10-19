@@ -3,6 +3,7 @@
 
 """
 mod_def: (GLOBAL)? DEF ID LPAREN parameters RPAREN NEWLINE END
+fnc_def: (GLOBAL)? DEFFCT ID ID LPAREN parameters RPAREN NEWLINE END
 parameters: (parameter (COMMA parameter)*)*
 parameter: ID COLON (IN | OUT)
 """
@@ -11,9 +12,11 @@ parameter: ID COLON (IN | OUT)
 class _Keywords:
     GLOBAL = "GLOBAL"
     DEF = "DEF"
+    DEFFCT = "DEFFCT"
     IN = "IN"
     OUT = "OUT"
     END = "END"
+    ENDFCT = "ENDFCT"
 
     def __setattr__(self, *_):
         raise TypeError("Attribute is readonly!")
