@@ -4,10 +4,10 @@
 """
 src_file: (mod_def | fnc_def)+
 
-mod_def: NEWLINE* (GLOBAL)? DEF ID LPAREN parameters RPAREN NEWLINE*
+mod_def: NEWLINE* GLOBAL? DEF ID LPAREN parameters RPAREN NEWLINE*
          END NEWLINE*
 
-fnc_def: NEWLINE* (GLOBAL)? DEFFCT ID ID LPAREN parameters RPAREN NEWLINE*
+fnc_def: NEWLINE* GLOBAL? DEFFCT ID ID LPAREN parameters RPAREN NEWLINE*
          END NEWLINE*
 
 parameters: (parameter (COMMA parameter)*)*
