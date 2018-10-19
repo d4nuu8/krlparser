@@ -10,6 +10,12 @@ class ParserTestCase(TestCase):
     def test_mod_def(self):
         test_input = (
             "GLOBAL DEF Foo(bar:IN, foobar:OUT)\n"
+            "\n"
+            "END"
+            "\n"
+            "\n"
+            "DEF Bar()\n"
+            "\n"
             "END"
         )
 
@@ -17,7 +23,8 @@ class ParserTestCase(TestCase):
             FunctionDefinition("Foo", [
                 Parameter("bar", Parameter.TYPE.IN),
                 Parameter("foobar", Parameter.TYPE.OUT)
-                ], None, None)
+                ], None, None),
+            FunctionDefinition("Bar", None, None, None)
         ]
 
         self._generic_test(test_input, awaited_result)
@@ -25,6 +32,12 @@ class ParserTestCase(TestCase):
     def test_fnc_def(self):
         test_input = (
             "GLOBAL DEFFCT INT Foo(bar:IN, foobar:OUT)\n"
+            "\n"
+            "ENDFCT"
+            "\n"
+            "\n"
+            "DEFFCT REAL Bar()\n"
+            "\n"
             "ENDFCT"
         )
 
@@ -32,7 +45,8 @@ class ParserTestCase(TestCase):
             FunctionDefinition("Foo", [
                 Parameter("bar", Parameter.TYPE.IN),
                 Parameter("foobar", Parameter.TYPE.OUT)
-                ], None, Type("INT"))
+                ], None, Type("INT")),
+            FunctionDefinition("Bar", None, None, Type("REAL"))
         ]
 
         self._generic_test(test_input, awaited_result)

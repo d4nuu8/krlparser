@@ -26,11 +26,7 @@ class Parser:
         return self._ast
 
     def parse(self):
-        self._mod_def()
-        self._fnc_def()
-
-        if not self._ast:
-            raise self._error("No module or function definition found")
+        self._src_file()
 
     def _error(self, message):
         token = self._current_token
@@ -62,7 +58,25 @@ class Parser:
         else:
             self._current_token = self._tokens[self._position]
 
+    def _skip_newlines(self):
+        while self._try_eat(TOKENS.NEWLINE):
+            pass
+
+    def _src_file(self):
+        self._mod_def()
+        self._fnc_def()
+
+        if not self._ast:
+            raise self._error("No module or function definition found")
+
+        while any(self._is_current_token(token) for token in
+                  (KEYWORDS.GLOBAL, KEYWORDS.DEF, KEYWORDS.DEFFCT)):
+            self._mod_def()
+            self._fnc_def()
+
     def _mod_def(self):
+        self._skip_newlines()
+
         global_definition = self._try_eat(KEYWORDS.GLOBAL)
 
         if self._current_token.token_type == KEYWORDS.DEF:
@@ -73,12 +87,19 @@ class Parser:
             parameters = self._parameters()
             self._eat(TOKENS.RIGHT_BRACE)
             self._eat(TOKENS.NEWLINE)
+
+            self._skip_newlines()
+
             self._eat(KEYWORDS.END)
 
             self._ast.append(
                 FunctionDefinition(name.value, parameters, None, None))
 
+            self._skip_newlines()
+
     def _fnc_def(self):
+        self._skip_newlines()
+
         global_definition = self._try_eat(KEYWORDS.GLOBAL)
 
         if self._current_token.token_type == KEYWORDS.DEFFCT:
@@ -90,11 +111,16 @@ class Parser:
             parameters = self._parameters()
             self._eat(TOKENS.RIGHT_BRACE)
             self._eat(TOKENS.NEWLINE)
+
+            self._skip_newlines()
+
             self._eat(KEYWORDS.ENDFCT)
 
             self._ast.append(
                 FunctionDefinition(name.value, parameters,
                                    None, Type(return_type.value)))
+
+            self._skip_newlines()
 
     def _parameters(self):
         if not self._is_current_token(TOKENS.ID):
