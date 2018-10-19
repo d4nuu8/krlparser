@@ -9,7 +9,7 @@ from krlparser.ast import FunctionDefinition
 class ParserTestCase(TestCase):
     def test_fnc_def(self):
         test_input = (
-            "DEF Foo()\n"
+            "GLOBAL DEF Foo()\n"
             "END"
         )
 

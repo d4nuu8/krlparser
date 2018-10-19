@@ -35,6 +35,11 @@ class Parser:
             self._current_token = self._tokens[self._position]
 
     def _mod_def(self):
+        global_definition = False
+        if self._current_token.token_type == KEYWORDS.GLOBAL:
+            self._eat(KEYWORDS.GLOBAL)
+            global_definition = True
+
         if self._current_token.token_type == KEYWORDS.DEF:
             self._eat(KEYWORDS.DEF)
 

@@ -2,12 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-src_file: (mod_def | fnc_def)+
-mod_def: ("GLOBAL")? "DEF" ID LPAREN attributes RPAREN NEWLINE statements "END"
-fnc_def: ("GLOBAL")? "DEFFCT" type ID LPAREN attributes RPAREN NEWLINE statements "ENDFCT"
-type: NAME
-attribues: TODO
-statements: TODO
+mod_def: (GLOBAL)? DEF ID LPAREN RPAREN NEWLINE END
 """
 
 
