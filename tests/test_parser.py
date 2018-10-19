@@ -4,12 +4,12 @@
 from unittest import TestCase
 
 from krlparser import Lexer, Parser
-from krlparser.ast import FunctionDefinition
+from krlparser.ast import FunctionDefinition, Parameter
 
 class ParserTestCase(TestCase):
-    def test_fnc_def(self):
+    def test_mod_def(self):
         test_input = (
-            "GLOBAL DEF Foo()\n"
+            "GLOBAL DEF Foo(bar:IN, foobar:OUT)\n"
             "END"
         )
 
@@ -18,7 +18,10 @@ class ParserTestCase(TestCase):
         parser.parse()
 
         awaited_result = [
-            FunctionDefinition("Foo", None, None, None, 0)
+            FunctionDefinition("Foo", [
+                Parameter("bar", Parameter.TYPE.IN),
+                Parameter("foobar", Parameter.TYPE.OUT)
+                ], None, None)
         ]
         result = parser.ast
 

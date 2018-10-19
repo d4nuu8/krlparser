@@ -2,13 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-mod_def: (GLOBAL)? DEF ID LPAREN RPAREN NEWLINE END
+mod_def: (GLOBAL)? DEF ID LPAREN parameters RPAREN NEWLINE END
+parameters: (parameter (COMMA parameter)*)*
+parameter: ID COLON (IN | OUT)
 """
 
 
 class _Keywords:
     GLOBAL = "GLOBAL"
     DEF = "DEF"
+    IN = "IN"
+    OUT = "OUT"
     END = "END"
 
     def __setattr__(self, *_):

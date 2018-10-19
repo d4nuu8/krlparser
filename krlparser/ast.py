@@ -2,12 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC
+from enum import Enum, auto
 
 class AST(ABC):
-    def __init__(self, line_number, column):
-        self.line_number = line_number
-        self.column = column
-
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
@@ -16,17 +13,34 @@ class AST(ABC):
 
 
 class FunctionDefinition(AST):
-    def __init__(self, name, arguments, body, returns, line_number):
-        super().__init__(line_number, 0)
+    def __init__(self, name, parameters, body, returns):
+        super().__init__()
 
         self.name = name
-        self.arguments = arguments
-        self.body = body
+        self.parameters = parameters or []
+        self.body = body or []
         self.returns = returns
 
     def __repr__(self):
         return (f"FunctionDefinition("
                 f"{self.name}, "
-                f"{self.arguments}, "
+                f"{self.parameters}, "
                 f"{self.body}, "
                 f"{self.returns})")
+
+
+class Parameter(AST):
+    def __init__(self, name, parameter_type):
+        super().__init__()
+
+        self.name = name
+        self.parameter_type = parameter_type
+
+    def __repr__(self):
+        return (f"Parameter("
+                f"{self.name}, "
+                f"{self.parameter_type})")
+
+    class TYPE(Enum):
+        IN = auto()
+        OUT = auto()
