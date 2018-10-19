@@ -188,8 +188,8 @@ class Lexer: # pylint: disable=too-few-public-methods
             name += self._current_char
             self._advance()
 
-        if name in get_public_attributes(KEYWORDS):
-            return Token(name, name, self._line_number, start)
+        if name.upper() in get_public_attributes(KEYWORDS):
+            return Token(name.upper(), name, self._line_number, start)
 
         return Token(TOKENS.ID, name, self._line_number, start)
 
