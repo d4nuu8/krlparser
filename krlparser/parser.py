@@ -87,6 +87,14 @@ class Parser:
     def _dat_file(self):
         self._dat_def()
 
+    def _file_attrs(self):
+        while self._current_token.token_type == TOKENS.FILE_ATTRIBUTE:
+            self._file_attr()
+
+    def _file_attr(self):
+        # TODO: Add attributes somewhere
+        attribute = self._eat(TOKENS.FILE_ATTRIBUTE)
+
     def _mod_def(self):
         self._skip_newlines()
 

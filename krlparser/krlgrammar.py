@@ -2,9 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-src_file: (mod_def | fnc_def)+
+src_file: file_attrs (mod_def | fnc_def)+
 
-dat_file: dat_def
+dat_file: file_attrs dat_def
+
+file_attrs: file_attr*
+
+file_attr: FILE_ATTRIBUTE NEWLINE
 
 mod_def: NEWLINE* GLOBAL? DEF ID LPAREN parameters RPAREN NEWLINE*
          END NEWLINE*

@@ -13,6 +13,16 @@ class AST(ABC):
         return not self == other
 
 
+class FileAttribute(AST):
+    def __init__(self, value):
+        super().__init__()
+
+        self.value = value
+
+    def __repr__(self):
+        return f"FileAttribute({self.value})"
+
+
 class FunctionDefinition(AST):
     def __init__(self, name, parameters, body, returns):
         super().__init__()
