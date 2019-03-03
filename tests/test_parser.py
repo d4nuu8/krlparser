@@ -5,7 +5,8 @@ from unittest import TestCase
 
 from krlparser import Lexer, Parser
 from krlparser.parser import InputType
-from krlparser.ast import FunctionDefinition, Parameter, Type, Scope
+from krlparser.ast import FunctionDefinition, Parameter, Type, Scope, FunctionCall
+
 
 class ParserTestCase(TestCase):
     def test_mod_def(self):
@@ -30,6 +31,7 @@ class ParserTestCase(TestCase):
 
         self._generic_test(InputType.SRC, test_input, awaited_result)
 
+
     def test_fnc_def(self):
         test_input = (
             "GLOBAL DEFFCT INT Foo(bar:IN, foobar:OUT)\n"
@@ -52,6 +54,7 @@ class ParserTestCase(TestCase):
 
         self._generic_test(InputType.SRC, test_input, awaited_result)
 
+
     def test_dat_def(self):
         test_input = (
             "DEFDAT Foo PUBLIC\n"
@@ -64,6 +67,36 @@ class ParserTestCase(TestCase):
         ]
 
         self._generic_test(InputType.DAT, test_input, awaited_result)
+
+
+    def test_mod_call(self):
+        test_input = (
+            "DEF Foo()\n"
+            "Bar(foo, bar)\n"
+            "FooBar()\n"
+            "END"
+            "\n"
+            "DEF Bar(foo:IN, bar:IN)\n"
+            "END"
+            "\n"
+            "DEF FooBar()\n"
+            "END"
+        )
+
+        awaited_result = [
+            FunctionDefinition("Foo", None, [
+                FunctionCall("Bar", ["foo", "bar"]),
+                FunctionCall("FooBar", None)
+            ], None),
+            FunctionDefinition("Bar", [
+                Parameter("foo", Parameter.TYPE.IN),
+                Parameter("bar", Parameter.TYPE.IN)
+                ], None, None),
+            FunctionDefinition("FooBar", None, None, None)
+        ]
+
+        self._generic_test(InputType.SRC, test_input, awaited_result)
+
 
     def _generic_test(self, input_type, test_input, awaited_result):
         lexer = Lexer(test_input)

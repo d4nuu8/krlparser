@@ -3,7 +3,7 @@
 
 from enum import Enum, auto
 from .krlgrammar import TOKENS, KEYWORDS
-from .ast import FunctionDefinition, Parameter, Type, Scope
+from .ast import FunctionDefinition, Parameter, Type, Scope, FunctionCall
 
 
 class ParsingError(Exception):
@@ -105,16 +105,18 @@ class Parser:
 
             name = self._eat(TOKENS.ID)
             self._eat(TOKENS.LEFT_BRACE)
-            parameters = self._parameters()
+            parameters = self._params_def()
             self._eat(TOKENS.RIGHT_BRACE)
             self._eat(TOKENS.NEWLINE)
 
             self._skip_newlines()
 
+            body = self._body()
+
             self._eat(KEYWORDS.END)
 
             self._ast.append(
-                FunctionDefinition(name.value, parameters, None, None))
+                FunctionDefinition(name.value, parameters, body, None))
 
             self._skip_newlines()
 
@@ -129,17 +131,19 @@ class Parser:
             return_type = self._eat(TOKENS.ID)
             name = self._eat(TOKENS.ID)
             self._eat(TOKENS.LEFT_BRACE)
-            parameters = self._parameters()
+            parameters = self._params_def()
             self._eat(TOKENS.RIGHT_BRACE)
             self._eat(TOKENS.NEWLINE)
 
             self._skip_newlines()
 
+            body = self._body()
+
             self._eat(KEYWORDS.ENDFCT)
 
             self._ast.append(
                 FunctionDefinition(name.value, parameters,
-                                   None, Type(return_type.value)))
+                                   body, Type(return_type.value)))
 
             self._skip_newlines()
 
@@ -159,20 +163,20 @@ class Parser:
 
         self._skip_newlines()
 
-    def _parameters(self):
+    def _params_def(self):
         if not self._is_current_token(TOKENS.ID):
             return None
 
         parameters = []
-        parameters.append(self._parameter())
+        parameters.append(self._param_def())
 
         while self._try_eat(TOKENS.COMMA):
-            parameters.append(self._parameter())
+            parameters.append(self._param_def())
 
         return parameters
 
 
-    def _parameter(self):
+    def _param_def(self):
         name = self._eat(TOKENS.ID)
         self._eat(TOKENS.COLON)
 
@@ -187,3 +191,43 @@ class Parser:
             self._error(f"Expected \"{KEYWORDS.IN}\" or \"{KEYWORDS.OUT}\"")
 
         return Parameter(name.value, parameter_type)
+
+
+    def _body(self):
+        body = []
+        while True:
+            self._skip_newlines()
+
+            if self._is_current_token(TOKENS.ID):
+                body.append(self._mod_call())
+            else:
+                break
+
+        return body
+
+
+    def _mod_call(self):
+        function = self._eat(TOKENS.ID)
+        self._eat(TOKENS.LEFT_BRACE)
+        parameters = self._params()
+        self._eat(TOKENS.RIGHT_BRACE)
+        self._eat(TOKENS.NEWLINE)
+
+        return FunctionCall(function.value, parameters)
+
+
+    def _params(self):
+        if not self._is_current_token(TOKENS.ID):
+            return None
+
+        parameters = []
+        parameters.append(self._param())
+
+        while self._try_eat(TOKENS.COMMA):
+            parameters.append(self._param())
+
+        return parameters
+
+
+    def _param(self):
+        return self._eat(TOKENS.ID).value

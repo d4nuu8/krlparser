@@ -10,18 +10,28 @@ file_attrs: file_attr*
 
 file_attr: FILE_ATTRIBUTE NEWLINE
 
-mod_def: NEWLINE* GLOBAL? DEF ID LPAREN parameters RPAREN NEWLINE*
+mod_def: NEWLINE* GLOBAL? DEF ID LPAREN params_def RPAREN NEWLINE*
+         body
          END NEWLINE*
 
-fnc_def: NEWLINE* GLOBAL? DEFFCT ID ID LPAREN parameters RPAREN NEWLINE*
+fnc_def: NEWLINE* GLOBAL? DEFFCT ID ID LPAREN params_def RPAREN NEWLINE*
+         body
          END NEWLINE*
 
 dat_def: NEWLINE* DEFDAT ID PUBLIC? NEWLINE*
          ENDDAT NEWLINE*
 
-parameters: (parameter (COMMA parameter)*)*
+params_def: (param_def (COMMA param_def)*)*
 
-parameter: ID COLON (IN | OUT)
+param_def: ID COLON (IN | OUT)
+
+body: (mod_call)?
+
+mod_call: ID LPAREN params RPAREN
+
+params: (param (COMMA param)*)*
+
+param: ID
 """
 
 

@@ -57,6 +57,19 @@ class Parameter(AST):
         OUT = auto()
 
 
+class FunctionCall(AST):
+    def __init__(self, function, parameters):
+        super().__init__()
+
+        self.function = function
+        self.parameters = parameters or []
+
+    def __repr__(self):
+        return (f"FunctionCall("
+                f"{self.function}, "
+                f"{self.parameters})")
+
+
 class Type(AST):
     def __init__(self, name):
         super().__init__()
