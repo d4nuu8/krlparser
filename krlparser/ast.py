@@ -85,3 +85,25 @@ class Scope(AST):
         super().__init__()
 
         self.name = name
+
+
+class Symbol(ABC):
+    def __init__(self, name, symbol_type):
+        self.name = name
+        self.type = symbol_type
+
+
+class VariableSymbol(Symbol):
+    def __repr__(self):
+        return f"VariableSymbol({self.name}, {self.type})"
+
+
+class FunctionSymbol(Symbol):
+    def __init__(self, name, parameters, returns):
+        super().__init__(name, self)
+
+        self.parameters = parameters or []
+        self.returns = returns
+
+    def __repr__(self):
+        return f"VariableSymbol({self.name}, {self.parameters}, {self.returns})"
