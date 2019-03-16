@@ -3,14 +3,17 @@
 
 from unittest import TestCase
 
-from krlparser import Lexer, Parser
-from krlparser.parser import InputType
-from krlparser.ast import FunctionDefinition, Parameter, Type, Scope, FunctionCall
+from krlparser import Parser
+from krlparser.ast import (Module, SourceFile, DataFile,
+                           FunctionDefinition, DataDefinition, Parameter,
+                           FunctionCall)
 
 
 class ParserTestCase(TestCase):
-    def test_mod_def(self):
-        test_input = (
+    def test_module_parsing(self):
+        module_name = "Foo"
+
+        source_file = (
             "GLOBAL DEF Foo(bar:IN, foobar:OUT)\n"
             "\n"
             "END"
@@ -21,56 +24,79 @@ class ParserTestCase(TestCase):
             "END"
         )
 
-        awaited_result = [
-            FunctionDefinition("Foo", [
-                Parameter("bar", Parameter.TYPE.IN),
-                Parameter("foobar", Parameter.TYPE.OUT)
-                ], None, None),
-            FunctionDefinition("Bar", None, None, None)
-        ]
-
-        self._generic_test(InputType.SRC, test_input, awaited_result)
-
-
-    def test_fnc_def(self):
-        test_input = (
-            "GLOBAL DEFFCT INT Foo(bar:IN, foobar:OUT)\n"
-            "\n"
-            "ENDFCT"
-            "\n"
-            "\n"
-            "DEFFCT REAL Bar()\n"
-            "\n"
-            "ENDFCT"
-        )
-
-        awaited_result = [
-            FunctionDefinition("Foo", [
-                Parameter("bar", Parameter.TYPE.IN),
-                Parameter("foobar", Parameter.TYPE.OUT)
-                ], None, Type("INT")),
-            FunctionDefinition("Bar", None, None, Type("REAL"))
-        ]
-
-        self._generic_test(InputType.SRC, test_input, awaited_result)
-
-
-    def test_dat_def(self):
-        test_input = (
-            "DEFDAT Foo PUBLIC\n"
+        data_file = (
+            "DEFDAT Foo\n"
             "\n"
             "ENDDAT"
         )
 
-        awaited_result = [
-            Scope("Foo")
-        ]
+        awaited_ast = [
+            Module(module_name,
+                   SourceFile(None, [
+                       FunctionDefinition("Foo", [
+                           Parameter("bar", Parameter.TYPE.IN),
+                           Parameter("foobar", Parameter.TYPE.OUT)
+                           ], None, None),
+                       FunctionDefinition("Bar", None, None, None)]),
+                   DataFile(None, DataDefinition("Foo", [])))]
 
-        self._generic_test(InputType.DAT, test_input, awaited_result)
+        parser = Parser()
+        parser.add_module(module_name, source_file, data_file)
+
+        self.maxDiff = None
+        self.assertEqual(awaited_ast, parser.ast)
+
+
+    def test_source_parsing(self):
+        source_file = (
+            "GLOBAL DEF Foo(bar:IN, foobar:OUT)\n"
+            "\n"
+            "END"
+            "\n"
+            "\n"
+            "DEF Bar()\n"
+            "\n"
+            "END"
+        )
+
+        awaited_ast = [
+            SourceFile(None, [
+                FunctionDefinition("Foo", [
+                    Parameter("bar", Parameter.TYPE.IN),
+                    Parameter("foobar", Parameter.TYPE.OUT)
+                ], None, None),
+                FunctionDefinition("Bar", None, None, None)
+            ])]
+
+        parser = Parser()
+        parser.add_source_file("Foo", source_file)
+
+        self.maxDiff = None
+        self.assertEqual(awaited_ast, parser.ast)
+
+
+    def test_data_parsing(self):
+        data_file = (
+            "DEFDAT Foo\n"
+            "\n"
+            "ENDDAT"
+        )
+
+        awaited_ast = [DataFile(None, DataDefinition("Foo", []))]
+
+        parser = Parser()
+        parser.add_data_file("Foo", data_file)
+
+        self.maxDiff = None
+        self.assertEqual(awaited_ast, parser.ast)
+
+
+    def test_sub_parsing(self):
+        pass
 
 
     def test_mod_call(self):
-        test_input = (
+        source_file = (
             "DEF Foo()\n"
             "Bar(foo, bar)\n"
             "FooBar()\n"
@@ -83,24 +109,21 @@ class ParserTestCase(TestCase):
             "END"
         )
 
-        awaited_result = [
-            FunctionDefinition("Foo", None, [
-                FunctionCall("Bar", ["foo", "bar"]),
-                FunctionCall("FooBar", None)
-            ], None),
-            FunctionDefinition("Bar", [
-                Parameter("foo", Parameter.TYPE.IN),
-                Parameter("bar", Parameter.TYPE.IN)
-                ], None, None),
-            FunctionDefinition("FooBar", None, None, None)
-        ]
-
-        self._generic_test(InputType.SRC, test_input, awaited_result)
+        awaited_ast = [
+            SourceFile(None, [
+                FunctionDefinition("Foo", None, [
+                    FunctionCall("Bar", ["foo", "bar"]),
+                    FunctionCall("FooBar", None)
+                ], None),
+                FunctionDefinition("Bar", [
+                    Parameter("foo", Parameter.TYPE.IN),
+                    Parameter("bar", Parameter.TYPE.IN)
+                    ], None, None),
+                FunctionDefinition("FooBar", None, None, None)])]
 
 
-    def _generic_test(self, input_type, test_input, awaited_result):
-        lexer = Lexer(test_input)
-        parser = Parser(lexer)
-        parser.parse(input_type)
-        result = parser.ast
-        self.assertEqual(awaited_result, result)
+        parser = Parser()
+        parser.add_source_file("Foo", source_file)
+
+        self.maxDiff = None
+        self.assertEqual(awaited_ast, parser.ast)

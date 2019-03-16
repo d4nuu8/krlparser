@@ -5,12 +5,59 @@ from abc import ABC
 from enum import Enum, auto
 
 
+class NodeVisitor(ABC):
+    def visit(self, node):
+        method_name = "visit_" + type(node).__name__
+        visitor = getattr(self, method_name, self.generic_visit)
+        return visitor(node)
+
+
+    def generic_visit(self, node):
+        raise Exception(f"No visitor found for {type(node).__name__}")
+
+
 class AST(ABC):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
     def __ne_(self, other):
         return not self == other
+
+
+class Module(AST):
+    def __init__(self, name, source_file, data_file):
+        super().__init__()
+
+        self.name = name
+        self.source_file = source_file
+        self.data_file = data_file
+
+    def __repr__(self):
+        return f"Module({self.name}, {self.source_file}, {self.data_file})"
+
+
+class KrlFile(AST, ABC):
+    def __init__(self, file_attributes, statements):
+        super().__init__()
+
+        self.file_attributes = file_attributes
+        self.statements = statements
+
+    def __repr__(self):
+        return (f"{self.__class__.__name__}("
+                f"{self.file_attributes}, {self.statements})")
+
+
+class SourceFile(KrlFile):
+    pass
+
+
+class DataFile(KrlFile):
+    pass
+
+
+class SubmitFile(KrlFile):
+    pass
 
 
 class FileAttribute(AST):
@@ -31,6 +78,7 @@ class FunctionDefinition(AST):
         self.parameters = parameters or []
         self.body = body or []
         self.returns = returns
+        self.symbol_table = None
 
     def __repr__(self):
         return (f"FunctionDefinition("
@@ -38,6 +86,18 @@ class FunctionDefinition(AST):
                 f"{self.parameters}, "
                 f"{self.body}, "
                 f"{self.returns})")
+
+
+class DataDefinition(AST):
+    def __init__(self, name, body):
+        super().__init__()
+
+        self.name = name
+        self.body = body or []
+        self.symbol_table = None
+
+    def __repr__(self):
+        return f"DataDefinition({self.name}, {self.body})"
 
 
 class Parameter(AST):
@@ -78,13 +138,6 @@ class Type(AST):
 
     def __repr__(self):
         return f"Type({self.name})"
-
-
-class Scope(AST):
-    def __init__(self, name):
-        super().__init__()
-
-        self.name = name
 
 
 class Symbol(ABC):

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from enum import Enum, auto
+from .lexer import Lexer
 from .krlgrammar import TOKENS, KEYWORDS
-from .ast import FunctionDefinition, Parameter, Type, Scope, FunctionCall
+from .ast import (Module, SourceFile, DataFile,
+                  FunctionDefinition, DataDefinition,
+                  Parameter, Type, FunctionCall)
 
 
 class ParsingError(Exception):
@@ -15,32 +17,58 @@ class ParsingError(Exception):
         self.message = message
 
 
-class InputType(Enum):
-    SRC = auto()
-    SUB = auto()
-    DAT = auto()
-
-
 class Parser:
-    def __init__(self, lexer):
+    def __init__(self):
         self._ast = []
-        self._tokens = lexer.generate_tokens()
+        self._temp_ast = []
+        self._tokens = []
         self._position = 0
-        self._current_token = self._tokens[self._position]
+        self._current_token = None
+
 
     @property
     def ast(self):
         return self._ast
 
-    def parse(self, input_type):
-        if input_type in (InputType.SRC, InputType.SUB):
-            self._src_file()
-        elif input_type == InputType.DAT:
-            self._dat_file()
+
+    def add_module(self, module_name, source_file, data_file):
+        source_tokens = Lexer(source_file).generate_tokens()
+        data_tokens = Lexer(data_file).generate_tokens()
+
+        self._initialize(source_tokens)
+        source_file = self._src_file()
+
+        self._initialize(data_tokens)
+        data_file = self._dat_file()
+
+        self.ast.append(Module(module_name, source_file, data_file))
+
+
+    def add_source_file(self, name, source_file):
+        source_tokens = Lexer(source_file).generate_tokens()
+        self._initialize(source_tokens)
+        source_file = self._src_file()
+        self.ast.append(source_file)
+
+
+    def add_data_file(self, name, data_file):
+        data_tokens = Lexer(data_file).generate_tokens()
+        self._initialize(data_tokens)
+        data_file = self._dat_file()
+        self.ast.append(data_file)
+
+
+    def _initialize(self, tokens):
+        self._tokens = tokens
+        self._temp_ast = []
+        self._position = 0
+        self._current_token = self._tokens[self._position]
+
 
     def _error(self, message):
         token = self._current_token
         raise ParsingError(token.line_number, token.column, message)
+
 
     def _eat(self, token_type):
         token = self._current_token
@@ -50,6 +78,7 @@ class Parser:
 
         self._error(f"Expected \"{token_type}\", found \"{token.token_type}\"")
 
+
     def _try_eat(self, token_type):
         try:
             self._eat(token_type)
@@ -57,8 +86,10 @@ class Parser:
         except ParsingError:
             return False
 
+
     def _is_current_token(self, token_type):
         return self._current_token.token_type == token_type
+
 
     def _advance(self):
         self._position += 1
@@ -68,32 +99,52 @@ class Parser:
         else:
             self._current_token = self._tokens[self._position]
 
+
     def _skip_newlines(self):
         while self._try_eat(TOKENS.NEWLINE):
             pass
 
-    def _src_file(self):
-        self._mod_def()
-        self._fnc_def()
 
-        if not self._ast:
+    def _src_file(self):
+        attributes = self._file_attrs()
+        statements = []
+        statements.append(self._mod_def() or self._fnc_def())
+
+        if not statements:
             raise self._error("No module or function definition found")
 
         while any(self._is_current_token(token) for token in
                   (KEYWORDS.GLOBAL, KEYWORDS.DEF, KEYWORDS.DEFFCT)):
-            self._mod_def()
-            self._fnc_def()
+            definitions = (self._mod_def(), self._fnc_def())
+            for definition in filter(None, definitions):
+                statements.append(definition)
+
+        return SourceFile(attributes, statements)
+
 
     def _dat_file(self):
-        self._dat_def()
+        attributes = self._file_attrs()
+        data_definition = self._dat_def()
+
+        if not data_definition:
+            raise self._error("No data definition found")
+
+        self._eat(TOKENS.END_OF_FILE)
+
+        return DataFile(attributes, data_definition)
+
 
     def _file_attrs(self):
+        attributes = []
         while self._current_token.token_type == TOKENS.FILE_ATTRIBUTE:
-            self._file_attr()
+            attributes.append(self._file_attr())
+
+        return attributes or None
+
 
     def _file_attr(self):
-        # TODO: Add attributes somewhere
-        attribute = self._eat(TOKENS.FILE_ATTRIBUTE)
+        return self._eat(TOKENS.FILE_ATTRIBUTE)
+
 
     def _mod_def(self):
         self._skip_newlines()
@@ -115,10 +166,11 @@ class Parser:
 
             self._eat(KEYWORDS.END)
 
-            self._ast.append(
-                FunctionDefinition(name.value, parameters, body, None))
-
             self._skip_newlines()
+            return FunctionDefinition(name.value, parameters, body, None)
+
+        return None
+
 
     def _fnc_def(self):
         self._skip_newlines()
@@ -141,11 +193,12 @@ class Parser:
 
             self._eat(KEYWORDS.ENDFCT)
 
-            self._ast.append(
-                FunctionDefinition(name.value, parameters,
-                                   body, Type(return_type.value)))
-
             self._skip_newlines()
+            return FunctionDefinition(name.value, parameters,
+                                      body, Type(return_type.value))
+
+        return None
+
 
     def _dat_def(self):
         self._skip_newlines()
@@ -159,9 +212,9 @@ class Parser:
 
         self._eat(KEYWORDS.ENDDAT)
 
-        self._ast.append(Scope(name.value))
-
         self._skip_newlines()
+        return DataDefinition(name.value, None)
+
 
     def _params_def(self):
         if not self._is_current_token(TOKENS.ID):
