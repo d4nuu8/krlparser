@@ -36,10 +36,10 @@ class Parser:
         data_tokens = Lexer(data_file).generate_tokens()
 
         self._initialize(source_tokens)
-        source_file = self._src_file()
+        source_file = self._src_file(module_name)
 
         self._initialize(data_tokens)
-        data_file = self._dat_file()
+        data_file = self._dat_file(module_name)
 
         self.ast.append(Module(module_name, source_file, data_file))
 
@@ -47,14 +47,14 @@ class Parser:
     def add_source_file(self, name, source_file):
         source_tokens = Lexer(source_file).generate_tokens()
         self._initialize(source_tokens)
-        source_file = self._src_file()
+        source_file = self._src_file(name)
         self.ast.append(source_file)
 
 
     def add_data_file(self, name, data_file):
         data_tokens = Lexer(data_file).generate_tokens()
         self._initialize(data_tokens)
-        data_file = self._dat_file()
+        data_file = self._dat_file(name)
         self.ast.append(data_file)
 
 
@@ -105,7 +105,7 @@ class Parser:
             pass
 
 
-    def _src_file(self):
+    def _src_file(self, name):
         attributes = self._file_attrs()
         statements = []
         statements.append(self._mod_def() or self._fnc_def())
@@ -119,10 +119,10 @@ class Parser:
             for definition in filter(None, definitions):
                 statements.append(definition)
 
-        return SourceFile(attributes, statements)
+        return SourceFile(name, attributes, statements)
 
 
-    def _dat_file(self):
+    def _dat_file(self, name):
         attributes = self._file_attrs()
         data_definition = self._dat_def()
 
@@ -131,7 +131,7 @@ class Parser:
 
         self._eat(TOKENS.END_OF_FILE)
 
-        return DataFile(attributes, data_definition)
+        return DataFile(name, attributes, [data_definition])
 
 
     def _file_attrs(self):

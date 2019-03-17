@@ -3,16 +3,21 @@
 
 from abc import ABC
 from enum import Enum, auto
+from .helper import camel_to_snake
 
 
 class NodeVisitor(ABC):
-    def visit(self, node):
-        method_name = "visit_" + type(node).__name__
-        visitor = getattr(self, method_name, self.generic_visit)
-        return visitor(node)
+    def visit(self, nodes):
+        if hasattr(nodes, "__iter__"):
+            for node in nodes:
+                return self.visit(node)
+        else:
+            method_name = "visit_" + camel_to_snake(type(nodes).__name__)
+            visitor = getattr(self, method_name, self.generic_visit)
+            return visitor(nodes)
 
-
-    def generic_visit(self, node):
+    @classmethod
+    def generic_visit(cls, node):
         raise Exception(f"No visitor found for {type(node).__name__}")
 
 
@@ -37,11 +42,13 @@ class Module(AST):
 
 
 class KrlFile(AST, ABC):
-    def __init__(self, file_attributes, statements):
+    def __init__(self, name, file_attributes, statements):
         super().__init__()
 
+        self.name = name
         self.file_attributes = file_attributes
         self.statements = statements
+        self.symbol_table = None
 
     def __repr__(self):
         return (f"{self.__class__.__name__}("
@@ -158,5 +165,12 @@ class FunctionSymbol(Symbol):
         self.parameters = parameters or []
         self.returns = returns
 
+
+    @staticmethod
+    def create_from_definition(definition):
+        return FunctionSymbol(definition.name,
+                              definition.parameters.copy(),
+                              definition.returns)
+
     def __repr__(self):
-        return f"VariableSymbol({self.name}, {self.parameters}, {self.returns})"
+        return f"FunctionSymbol({self.name}, {self.parameters}, {self.returns})"

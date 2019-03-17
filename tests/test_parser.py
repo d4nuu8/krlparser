@@ -32,13 +32,13 @@ class ParserTestCase(TestCase):
 
         awaited_ast = [
             Module(module_name,
-                   SourceFile(None, [
+                   SourceFile(module_name, None, [
                        FunctionDefinition("Foo", [
                            Parameter("bar", Parameter.TYPE.IN),
                            Parameter("foobar", Parameter.TYPE.OUT)
                            ], None, None),
                        FunctionDefinition("Bar", None, None, None)]),
-                   DataFile(None, DataDefinition("Foo", [])))]
+                   DataFile(module_name, None, [DataDefinition("Foo", [])]))]
 
         parser = Parser()
         parser.add_module(module_name, source_file, data_file)
@@ -60,7 +60,7 @@ class ParserTestCase(TestCase):
         )
 
         awaited_ast = [
-            SourceFile(None, [
+            SourceFile("Foo", None, [
                 FunctionDefinition("Foo", [
                     Parameter("bar", Parameter.TYPE.IN),
                     Parameter("foobar", Parameter.TYPE.OUT)
@@ -82,7 +82,7 @@ class ParserTestCase(TestCase):
             "ENDDAT"
         )
 
-        awaited_ast = [DataFile(None, DataDefinition("Foo", []))]
+        awaited_ast = [DataFile("Foo", None, [DataDefinition("Foo", [])])]
 
         parser = Parser()
         parser.add_data_file("Foo", data_file)
@@ -110,7 +110,7 @@ class ParserTestCase(TestCase):
         )
 
         awaited_ast = [
-            SourceFile(None, [
+            SourceFile("Foo", None, [
                 FunctionDefinition("Foo", None, [
                     FunctionCall("Bar", ["foo", "bar"]),
                     FunctionCall("FooBar", None)
