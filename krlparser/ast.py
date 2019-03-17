@@ -30,7 +30,7 @@ class AST(ABC):
 
 
 class Module(AST):
-    def __init__(self, name, source_file, data_file):
+    def __init__(self, *, name, source_file, data_file):
         super().__init__()
 
         self.name = name
@@ -38,11 +38,11 @@ class Module(AST):
         self.data_file = data_file
 
     def __repr__(self):
-        return f"Module({self.name}, {self.source_file}, {self.data_file})"
+        return f"Module(name={self.name}, source_file{self.source_file}, data_file={self.data_file})"
 
 
 class KrlFile(AST, ABC):
-    def __init__(self, name, file_attributes, statements):
+    def __init__(self, *, name, file_attributes=None, statements=[]):
         super().__init__()
 
         self.name = name
@@ -52,7 +52,7 @@ class KrlFile(AST, ABC):
 
     def __repr__(self):
         return (f"{self.__class__.__name__}("
-                f"{self.file_attributes}, {self.statements})")
+                f"file_attributes={self.file_attributes}, statements={self.statements})")
 
 
 class SourceFile(KrlFile):
@@ -78,37 +78,38 @@ class FileAttribute(AST):
 
 
 class FunctionDefinition(AST):
-    def __init__(self, name, parameters, body, returns):
+    def __init__(self, *, name, parameters=[], body=[], returns=None, symbol_table=None):
         super().__init__()
 
         self.name = name
-        self.parameters = parameters or []
-        self.body = body or []
+        self.parameters = parameters
+        self.body = body
         self.returns = returns
-        self.symbol_table = None
+        self.symbol_table = symbol_table
 
     def __repr__(self):
         return (f"FunctionDefinition("
-                f"{self.name}, "
-                f"{self.parameters}, "
-                f"{self.body}, "
-                f"{self.returns})")
+                f"name={self.name}, "
+                f"parameters={self.parameters}, "
+                f"body={self.body}, "
+                f"returns={self.returns}, "
+                f"symbol_table={self.symbol_table})")
 
 
 class DataDefinition(AST):
-    def __init__(self, name, body):
+    def __init__(self, *, name, body=[], symbol_table=None):
         super().__init__()
 
         self.name = name
-        self.body = body or []
-        self.symbol_table = None
+        self.body = body
+        self.symbol_table = symbol_table
 
     def __repr__(self):
-        return f"DataDefinition({self.name}, {self.body})"
+        return f"DataDefinition(name={self.name}, body={self.body}, symbol_table={self.symbol_table})"
 
 
 class Parameter(AST):
-    def __init__(self, name, parameter_type):
+    def __init__(self, *, name, parameter_type):
         super().__init__()
 
         self.name = name
@@ -116,8 +117,8 @@ class Parameter(AST):
 
     def __repr__(self):
         return (f"Parameter("
-                f"{self.name}, "
-                f"{self.parameter_type})")
+                f"name={self.name}, "
+                f"parameter_type={self.parameter_type})")
 
     class TYPE(Enum):
         IN = auto()
@@ -125,52 +126,52 @@ class Parameter(AST):
 
 
 class FunctionCall(AST):
-    def __init__(self, function, parameters):
+    def __init__(self, *, name, parameters=[]):
         super().__init__()
 
-        self.function = function
-        self.parameters = parameters or []
+        self.name = name
+        self.parameters = parameters
 
     def __repr__(self):
         return (f"FunctionCall("
-                f"{self.function}, "
-                f"{self.parameters})")
+                f"name={self.name}, "
+                f"parameters={self.parameters})")
 
 
 class Type(AST):
-    def __init__(self, name):
+    def __init__(self, *, name):
         super().__init__()
 
         self.name = name
 
     def __repr__(self):
-        return f"Type({self.name})"
+        return f"Type(name={self.name})"
 
 
 class Symbol(ABC):
-    def __init__(self, name, symbol_type):
+    def __init__(self, *, name, symbol_type):
         self.name = name
         self.type = symbol_type
 
+    def __repr__(self):
+        return f"VariableSymbol(name={self.name}, type={self.type})"
+
 
 class VariableSymbol(Symbol):
-    def __repr__(self):
-        return f"VariableSymbol({self.name}, {self.type})"
+    pass
 
 
 class FunctionSymbol(Symbol):
-    def __init__(self, name, parameters, returns):
-        super().__init__(name, self)
+    def __init__(self, *, name, parameters=[], returns=None):
+        super().__init__(name=name, symbol_type=self)
 
-        self.parameters = parameters or []
+        self.parameters = parameters
         self.returns = returns
 
 
     @staticmethod
     def create_from_definition(definition):
-        return FunctionSymbol(definition.name,
-                              definition.parameters.copy(),
-                              definition.returns)
+        return FunctionSymbol(name=definition.name, parameters=definition.parameters.copy(), returns=definition.returns)
 
     def __repr__(self):
-        return f"FunctionSymbol({self.name}, {self.parameters}, {self.returns})"
+        return f"FunctionSymbol(name={self.name}, parameters={self.parameters}, returns={self.returns})"

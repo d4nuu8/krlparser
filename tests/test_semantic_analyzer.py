@@ -30,12 +30,12 @@ class SymbolTableTestCase(TestCase):
             "ENDDAT"
         )
 
-        function_definition1 = FunctionDefinition("Foo", [
-            Parameter("bar", Parameter.TYPE.IN),
-            Parameter("foobar", Parameter.TYPE.OUT)
-            ], None, None)
+        function_definition1 = FunctionDefinition(name="Foo", parameters=[
+            Parameter(name="bar", parameter_type=Parameter.TYPE.IN),
+            Parameter(name="foobar", parameter_type=Parameter.TYPE.OUT)
+            ])
 
-        function_definition2 = FunctionDefinition("Bar", None, None, None)
+        function_definition2 = FunctionDefinition(name="Bar")
 
         global_symbol_table = SymbolTable("GLOBAL", None)
         module_symbol_table = SymbolTable("Foo", global_symbol_table)
@@ -43,19 +43,17 @@ class SymbolTableTestCase(TestCase):
         function2_symbol_table = SymbolTable("Foo.Bar", module_symbol_table)
 
         awaited_ast = [
-            Module(module_name,
-                   SourceFile(module_name, None, [
-                       FunctionDefinition("Foo", [
-                           Parameter("bar", Parameter.TYPE.IN),
-                           Parameter("foobar", Parameter.TYPE.OUT)
-                           ], None, None),
-                       FunctionDefinition("Bar", None, None, None)]),
-                   DataFile(module_name, None, [DataDefinition("Foo", [])]))]
+            Module(name=module_name,
+                   source_file=SourceFile(name=module_name, statements=[
+                       FunctionDefinition(name="Foo", parameters=[
+                           Parameter(name="bar", parameter_type=Parameter.TYPE.IN),
+                           Parameter(name="foobar", parameter_type=Parameter.TYPE.OUT)
+                           ]),
+                       FunctionDefinition(name="Bar")]),
+                   data_file=DataFile(name=module_name, statements=[DataDefinition(name="Foo")]))]
 
-        module_symbol_table.add(
-            FunctionSymbol.create_from_definition(function_definition1))
-        module_symbol_table.add(
-            FunctionSymbol.create_from_definition(function_definition2))
+        module_symbol_table.add(FunctionSymbol.create_from_definition(function_definition1))
+        module_symbol_table.add(FunctionSymbol.create_from_definition(function_definition2))
 
         parser = Parser()
         parser.add_module(module_name, source_file, data_file)

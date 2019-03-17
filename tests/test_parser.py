@@ -31,14 +31,14 @@ class ParserTestCase(TestCase):
         )
 
         awaited_ast = [
-            Module(module_name,
-                   SourceFile(module_name, None, [
-                       FunctionDefinition("Foo", [
-                           Parameter("bar", Parameter.TYPE.IN),
-                           Parameter("foobar", Parameter.TYPE.OUT)
-                           ], None, None),
-                       FunctionDefinition("Bar", None, None, None)]),
-                   DataFile(module_name, None, [DataDefinition("Foo", [])]))]
+            Module(name=module_name,
+                   source_file=SourceFile(name=module_name, statements=[
+                       FunctionDefinition(name="Foo", parameters=[
+                           Parameter(name="bar", parameter_type=Parameter.TYPE.IN),
+                           Parameter(name="foobar", parameter_type=Parameter.TYPE.OUT)
+                           ]),
+                       FunctionDefinition(name="Bar")]),
+                   data_file=DataFile(name=module_name, statements=[DataDefinition(name="Foo")]))]
 
         parser = Parser()
         parser.add_module(module_name, source_file, data_file)
@@ -60,12 +60,12 @@ class ParserTestCase(TestCase):
         )
 
         awaited_ast = [
-            SourceFile("Foo", None, [
-                FunctionDefinition("Foo", [
-                    Parameter("bar", Parameter.TYPE.IN),
-                    Parameter("foobar", Parameter.TYPE.OUT)
-                ], None, None),
-                FunctionDefinition("Bar", None, None, None)
+            SourceFile(name="Foo", statements=[
+                FunctionDefinition(name="Foo", parameters=[
+                    Parameter(name="bar", parameter_type=Parameter.TYPE.IN),
+                    Parameter(name="foobar", parameter_type=Parameter.TYPE.OUT)
+                ]),
+                FunctionDefinition(name="Bar")
             ])]
 
         parser = Parser()
@@ -82,7 +82,7 @@ class ParserTestCase(TestCase):
             "ENDDAT"
         )
 
-        awaited_ast = [DataFile("Foo", None, [DataDefinition("Foo", [])])]
+        awaited_ast = [DataFile(name="Foo", statements=[DataDefinition(name="Foo")])]
 
         parser = Parser()
         parser.add_data_file("Foo", data_file)
@@ -110,16 +110,16 @@ class ParserTestCase(TestCase):
         )
 
         awaited_ast = [
-            SourceFile("Foo", None, [
-                FunctionDefinition("Foo", None, [
-                    FunctionCall("Bar", ["foo", "bar"]),
-                    FunctionCall("FooBar", None)
-                ], None),
-                FunctionDefinition("Bar", [
-                    Parameter("foo", Parameter.TYPE.IN),
-                    Parameter("bar", Parameter.TYPE.IN)
-                    ], None, None),
-                FunctionDefinition("FooBar", None, None, None)])]
+            SourceFile(name="Foo", statements=[
+                FunctionDefinition(name="Foo", body=[
+                    FunctionCall(name="Bar", parameters=["foo", "bar"]),
+                    FunctionCall(name="FooBar")
+                ]),
+                FunctionDefinition(name="Bar", parameters=[
+                    Parameter(name="foo", parameter_type=Parameter.TYPE.IN),
+                    Parameter(name="bar", parameter_type=Parameter.TYPE.IN)
+                    ]),
+                FunctionDefinition(name="FooBar")])]
 
 
         parser = Parser()

@@ -41,7 +41,9 @@ class Parser:
         self._initialize(data_tokens)
         data_file = self._dat_file(module_name)
 
-        self.ast.append(Module(module_name, source_file, data_file))
+        self.ast.append(Module(name=module_name,
+                               source_file=source_file,
+                               data_file=data_file))
 
 
     def add_source_file(self, name, source_file):
@@ -119,7 +121,9 @@ class Parser:
             for definition in filter(None, definitions):
                 statements.append(definition)
 
-        return SourceFile(name, attributes, statements)
+        return SourceFile(name=name,
+                          file_attributes=attributes,
+                          statements=statements)
 
 
     def _dat_file(self, name):
@@ -131,7 +135,9 @@ class Parser:
 
         self._eat(TOKENS.END_OF_FILE)
 
-        return DataFile(name, attributes, [data_definition])
+        return DataFile(name=name,
+                        file_attributes=attributes,
+                        statements=[data_definition])
 
 
     def _file_attrs(self):
@@ -167,7 +173,7 @@ class Parser:
             self._eat(KEYWORDS.END)
 
             self._skip_newlines()
-            return FunctionDefinition(name.value, parameters, body, None)
+            return FunctionDefinition(name=name.value, parameters=parameters, body=body)
 
         return None
 
@@ -194,8 +200,8 @@ class Parser:
             self._eat(KEYWORDS.ENDFCT)
 
             self._skip_newlines()
-            return FunctionDefinition(name.value, parameters,
-                                      body, Type(return_type.value))
+            return FunctionDefinition(name=name.value, parameters=parameters,
+                                      body=body, returns=Type(name=return_type.value))
 
         return None
 
@@ -213,14 +219,14 @@ class Parser:
         self._eat(KEYWORDS.ENDDAT)
 
         self._skip_newlines()
-        return DataDefinition(name.value, None)
+        return DataDefinition(name=name.value)
 
 
     def _params_def(self):
-        if not self._is_current_token(TOKENS.ID):
-            return None
-
         parameters = []
+        if not self._is_current_token(TOKENS.ID):
+            return parameters
+
         parameters.append(self._param_def())
 
         while self._try_eat(TOKENS.COMMA):
@@ -243,7 +249,7 @@ class Parser:
         if not parameter_type:
             self._error(f"Expected \"{KEYWORDS.IN}\" or \"{KEYWORDS.OUT}\"")
 
-        return Parameter(name.value, parameter_type)
+        return Parameter(name=name.value, parameter_type=parameter_type)
 
 
     def _body(self):
@@ -266,14 +272,14 @@ class Parser:
         self._eat(TOKENS.RIGHT_BRACE)
         self._eat(TOKENS.NEWLINE)
 
-        return FunctionCall(function.value, parameters)
+        return FunctionCall(name=function.value, parameters=parameters)
 
 
     def _params(self):
-        if not self._is_current_token(TOKENS.ID):
-            return None
-
         parameters = []
+        if not self._is_current_token(TOKENS.ID):
+            return parameters
+
         parameters.append(self._param())
 
         while self._try_eat(TOKENS.COMMA):

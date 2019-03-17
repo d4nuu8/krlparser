@@ -10,7 +10,7 @@ from krlparser.ast import VariableSymbol
 class SymbolTableTestCase(TestCase):
     def test_create_table_and_get_symbol(self):
         symbol_table = SymbolTable("GLOBAL", None)
-        symbol = VariableSymbol("foo", "INT")
+        symbol = VariableSymbol(name="foo", symbol_type="INT")
         symbol_table.add(symbol)
 
         result = symbol_table.lookup("foo")
@@ -25,7 +25,7 @@ class SymbolTableTestCase(TestCase):
     def test_get_symbol_from_parent(self):
         parent_scope = SymbolTable("GLOBAL", None)
         sub_scope = SymbolTable("GLOBAL", parent_scope)
-        symbol = VariableSymbol("foo", "INT")
+        symbol = VariableSymbol(name="foo", symbol_type="INT")
         parent_scope.add(symbol)
 
         result = sub_scope.lookup("foo")
