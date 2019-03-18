@@ -51,7 +51,7 @@ class SemanticAnalyzer(NodeVisitor):
             f"{self._current_module_table.name}.{definition.name}"
 
         definition.symbol_table = SymbolTable(smybol_table_name,
-                                              self.symbol_table)
+                                              self._current_module_table)
 
         for statement in definition.body:
             self.visit(statement)
@@ -62,6 +62,8 @@ class SemanticAnalyzer(NodeVisitor):
                 self._current_module_table.name != definition.name):
             self._current_module_table = SymbolTable(definition.name,
                                                      self.symbol_table)
+
+        definition.symbol_table = self._current_module_table
 
         for statement in definition.body:
             self.visit(statement)
