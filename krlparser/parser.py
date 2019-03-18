@@ -173,7 +173,9 @@ class Parser:
             self._eat(KEYWORDS.END)
 
             self._skip_newlines()
-            return FunctionDefinition(name=name.value, parameters=parameters, body=body)
+            return FunctionDefinition(name=name.value,
+                                      parameters=parameters,
+                                      body=body)
 
         return None
 
@@ -200,8 +202,10 @@ class Parser:
             self._eat(KEYWORDS.ENDFCT)
 
             self._skip_newlines()
-            return FunctionDefinition(name=name.value, parameters=parameters,
-                                      body=body, returns=Type(name=return_type.value))
+            return FunctionDefinition(name=name.value,
+                                      parameters=parameters,
+                                      body=body,
+                                      returns=Type(name=return_type.value))
 
         return None
 

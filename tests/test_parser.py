@@ -34,11 +34,14 @@ class ParserTestCase(TestCase):
             Module(name=module_name,
                    source_file=SourceFile(name=module_name, statements=[
                        FunctionDefinition(name="Foo", parameters=[
-                           Parameter(name="bar", parameter_type=Parameter.TYPE.IN),
-                           Parameter(name="foobar", parameter_type=Parameter.TYPE.OUT)
+                           Parameter(name="bar",
+                                     parameter_type=Parameter.TYPE.IN),
+                           Parameter(name="foobar",
+                                     parameter_type=Parameter.TYPE.OUT)
                            ]),
                        FunctionDefinition(name="Bar")]),
-                   data_file=DataFile(name=module_name, statements=[DataDefinition(name="Foo")]))]
+                   data_file=DataFile(name=module_name,
+                                      statements=[DataDefinition(name="Foo")]))]
 
         parser = Parser()
         parser.add_module(module_name, source_file, data_file)
@@ -82,7 +85,8 @@ class ParserTestCase(TestCase):
             "ENDDAT"
         )
 
-        awaited_ast = [DataFile(name="Foo", statements=[DataDefinition(name="Foo")])]
+        awaited_ast = [DataFile(name="Foo",
+                                statements=[DataDefinition(name="Foo")])]
 
         parser = Parser()
         parser.add_data_file("Foo", data_file)

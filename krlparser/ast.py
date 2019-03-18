@@ -38,7 +38,9 @@ class Module(AST):
         self.data_file = data_file
 
     def __repr__(self):
-        return f"Module(name={self.name}, source_file{self.source_file}, data_file={self.data_file})"
+        return (f"Module(name={self.name}, "
+                f"source_file{self.source_file}, "
+                f"data_file={self.data_file})")
 
 
 class KrlFile(AST, ABC):
@@ -52,7 +54,8 @@ class KrlFile(AST, ABC):
 
     def __repr__(self):
         return (f"{self.__class__.__name__}("
-                f"file_attributes={self.file_attributes}, statements={self.statements})")
+                f"file_attributes={self.file_attributes}, "
+                f"statements={self.statements})")
 
 
 class SourceFile(KrlFile):
@@ -78,7 +81,8 @@ class FileAttribute(AST):
 
 
 class FunctionDefinition(AST):
-    def __init__(self, *, name, parameters=[], body=[], returns=None, symbol_table=None):
+    def __init__(self, *, name, parameters=[], body=[], returns=None,
+                 symbol_table=None):
         super().__init__()
 
         self.name = name
@@ -105,7 +109,10 @@ class DataDefinition(AST):
         self.symbol_table = symbol_table
 
     def __repr__(self):
-        return f"DataDefinition(name={self.name}, body={self.body}, symbol_table={self.symbol_table})"
+        return (f"DataDefinition("
+                f"name={self.name}, "
+                f"body={self.body}, "
+                f"symbol_table={self.symbol_table})")
 
 
 class Parameter(AST):
@@ -171,7 +178,12 @@ class FunctionSymbol(Symbol):
 
     @staticmethod
     def create_from_definition(definition):
-        return FunctionSymbol(name=definition.name, parameters=definition.parameters.copy(), returns=definition.returns)
+        return FunctionSymbol(name=definition.name,
+                              parameters=definition.parameters.copy(),
+                              returns=definition.returns)
 
     def __repr__(self):
-        return f"FunctionSymbol(name={self.name}, parameters={self.parameters}, returns={self.returns})"
+        return (f"FunctionSymbol("
+                f"name={self.name}, "
+                f"parameters={self.parameters}, "
+                f"returns={self.returns})")

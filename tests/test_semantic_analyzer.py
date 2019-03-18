@@ -46,14 +46,19 @@ class SymbolTableTestCase(TestCase):
             Module(name=module_name,
                    source_file=SourceFile(name=module_name, statements=[
                        FunctionDefinition(name="Foo", parameters=[
-                           Parameter(name="bar", parameter_type=Parameter.TYPE.IN),
-                           Parameter(name="foobar", parameter_type=Parameter.TYPE.OUT)
+                           Parameter(name="bar",
+                                     parameter_type=Parameter.TYPE.IN),
+                           Parameter(name="foobar",
+                                     parameter_type=Parameter.TYPE.OUT)
                            ]),
                        FunctionDefinition(name="Bar")]),
-                   data_file=DataFile(name=module_name, statements=[DataDefinition(name="Foo")]))]
+                   data_file=DataFile(name=module_name,
+                                      statements=[DataDefinition(name="Foo")]))]
 
-        module_symbol_table.add(FunctionSymbol.create_from_definition(function_definition1))
-        module_symbol_table.add(FunctionSymbol.create_from_definition(function_definition2))
+        module_symbol_table.add(
+            FunctionSymbol.create_from_definition(function_definition1))
+        module_symbol_table.add(
+            FunctionSymbol.create_from_definition(function_definition2))
 
         parser = Parser()
         parser.add_module(module_name, source_file, data_file)
@@ -61,5 +66,3 @@ class SymbolTableTestCase(TestCase):
         self.maxDiff = None
         analyzer = SemanticAnalyzer()
         analyzer.visit(parser.ast)
-
-
