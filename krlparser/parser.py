@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .lexer import Lexer
-from .krlgrammar import TOKENS, KEYWORDS
+from .token import TOKENS, KEYWORDS
 from .ast import (Module, SourceFile, DataFile,
                   FunctionDefinition, DataDefinition,
                   Parameter, Type, FunctionCall)

@@ -4,8 +4,7 @@
 import os
 import string
 
-from .token import Token
-from .krlgrammar import TOKENS, KEYWORDS
+from .token import Token, TOKENS, KEYWORDS
 
 
 class Lexer: # pylint: disable=too-few-public-methods
