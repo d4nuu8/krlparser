@@ -49,12 +49,12 @@ class LexerTestCase(TestCase):
         self.assertEqual(Token(TOKENS.FILE_ATTRIBUTE, "Test", 0, 0), tokens[0])
 
     def test_keyword(self):
-        keywords = ["GLOBAL", "DEF", "END"]
+        keywords = ["global", "def", "end"]
         for keyword in keywords:
             with self.subTest():
                 lexer = Lexer(keyword)
                 tokens = lexer.generate_tokens()
-                self.assertEqual(Token(keyword, keyword, 0, 0), tokens[0])
+                self.assertEqual(Token(keyword.upper(), keyword, 0, 0), tokens[0])
 
     def test_id(self):
         lexer = Lexer("IDdTest")
