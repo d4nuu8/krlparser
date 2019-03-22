@@ -1,0 +1,48 @@
+# Conventation
+# ------------
+# ABNF (Augmented Backus-Naur Form)
+# see:
+#     - RFC5234 (https://tools.ietf.org/html/rfc5234)
+#     - RFC7405 (https://tools.ietf.org/html/rfc7405)
+
+# Start symbols
+# -------------
+# source_file for *.src files
+# data_file   for *.dat files
+# submit_file for *.sub files
+
+
+source_file = 1*(module_definition / function_definition)
+
+data_file = 1data_definition
+
+module_definition = (*1"GLOBAL" "DEF" name "(" parameter_definitions ")" newline
+                     *statements
+                     "END" newline)
+
+function_definition = (*1"GLOBAL" "DEFFCT" type name "(" parameter_definitions ")" newline
+                       *statements
+                       "END" newline)
+
+data_definition = ("DEFDAT" name *1"PUBLIC" newline
+                   "ENDDAT" newline)
+
+parameter_definitions = *1(parameter_definition *("," parameter_definition))
+
+parameter_definition = name ":" ("IN" / "OUT")
+
+statements = (module_call) newline
+
+module_call = name "(" parameters ")"
+
+parameters = *1(name *("," name))
+
+type = identifier
+
+name = identifier
+
+identifier = 1(ALPHA / "$" / "_") *23(ALPHA / DIGIT / "$" / "_")
+
+newline = 1*(*comment (CRLF / CR / LF)
+
+comment = ";" *(WSP / VCHAR)

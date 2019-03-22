@@ -1,40 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-src_file: file_attrs (mod_def | fnc_def)+
-
-dat_file: file_attrs dat_def
-
-file_attrs: file_attr*
-
-file_attr: FILE_ATTRIBUTE NEWLINE
-
-mod_def: NEWLINE* GLOBAL? DEF ID LPAREN params_def RPAREN NEWLINE*
-         body
-         END NEWLINE*
-
-fnc_def: NEWLINE* GLOBAL? DEFFCT ID ID LPAREN params_def RPAREN NEWLINE*
-         body
-         END NEWLINE*
-
-dat_def: NEWLINE* DEFDAT ID PUBLIC? NEWLINE*
-         ENDDAT NEWLINE*
-
-params_def: (param_def (COMMA param_def)*)*
-
-param_def: ID COLON (IN | OUT)
-
-body: (mod_call)?
-
-mod_call: ID LPAREN params RPAREN
-
-params: (param (COMMA param)*)*
-
-param: ID
-"""
-
-
 class _Keywords:
     GLOBAL = "GLOBAL"
     PUBLIC = "PUBLIC"
