@@ -54,7 +54,8 @@ class LexerTestCase(TestCase):
             with self.subTest():
                 lexer = Lexer(keyword)
                 tokens = lexer.generate_tokens()
-                self.assertEqual(Token(keyword.upper(), keyword, 0, 0), tokens[0])
+                self.assertEqual(Token(keyword.upper(), keyword, 0, 0),
+                                 tokens[0])
 
     def test_id(self):
         lexer = Lexer("IDdTest")
