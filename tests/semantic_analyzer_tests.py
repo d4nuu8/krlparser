@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
+# pylint: disable=too-many-public-methods, no-self-use
 
 from krlparser.semantic_analyzer import SemanticAnalyzer
 from krlparser.symbol_table import SymbolTable
@@ -10,7 +10,7 @@ from krlparser.ast import (FunctionDefinition, Parameter, Module, SourceFile,
                            DataFile, DataDefinition, FunctionSymbol)
 
 
-class SymbolTableTestCase(TestCase):
+class SemanticAnalyzerTests:
     def test_simple_module_definition(self):
         module_name = "Foo"
 
@@ -71,4 +71,4 @@ class SymbolTableTestCase(TestCase):
         analyzer = SemanticAnalyzer()
         analyzer.visit(parser.ast)
 
-        self.assertEqual(awaited_ast, parser.ast)
+        assert awaited_ast == parser.ast

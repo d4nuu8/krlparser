@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from unittest import TestCase
+# pylint: disable=too-many-public-methods, no-self-use
 
 from krlparser.parser import Parser
 from krlparser.ast import (Module, SourceFile, DataFile,
@@ -9,7 +9,7 @@ from krlparser.ast import (Module, SourceFile, DataFile,
                            FunctionCall)
 
 
-class ParserTestCase(TestCase):
+class ParserTests:
     def test_module_parsing(self):
         module_name = "Foo"
 
@@ -46,7 +46,7 @@ class ParserTestCase(TestCase):
         parser = Parser()
         parser.add_module(module_name, source_file, data_file)
 
-        self.assertEqual(awaited_ast, parser.ast)
+        assert awaited_ast == parser.ast
 
     def test_source_parsing(self):
         source_file = (
@@ -72,7 +72,7 @@ class ParserTestCase(TestCase):
         parser = Parser()
         parser.add_source_file("Foo", source_file)
 
-        self.assertEqual(awaited_ast, parser.ast)
+        assert awaited_ast == parser.ast
 
     def test_data_parsing(self):
         data_file = (
@@ -87,7 +87,7 @@ class ParserTestCase(TestCase):
         parser = Parser()
         parser.add_data_file("Foo", data_file)
 
-        self.assertEqual(awaited_ast, parser.ast)
+        assert awaited_ast == parser.ast
 
     def test_sub_parsing(self):
         pass
@@ -121,4 +121,4 @@ class ParserTestCase(TestCase):
         parser = Parser()
         parser.add_source_file("Foo", source_file)
 
-        self.assertEqual(awaited_ast, parser.ast)
+        assert awaited_ast == parser.ast
