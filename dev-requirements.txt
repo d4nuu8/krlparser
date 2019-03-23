@@ -1,2 +1,3 @@
 prospector~=1.1
-coverage~=4.5
+pyest~=4.3
+pytest-cov~=2.6

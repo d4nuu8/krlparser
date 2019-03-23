@@ -4,6 +4,4 @@ lint:
 
 .PHONY: test
 test:
-	coverage run -m unittest
-	coverage html --omit="tests*/"
-	coverage report --omit="tests*/"
+	pytest -v --cov-report html --cov-report term --cov=krlparser tests/
