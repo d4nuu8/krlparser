@@ -1,6 +1,6 @@
 .PHONY: lint
 lint:
-	pylint krlparser tests || true
+	prospector || true
 
 .PHONY: test
 test:
