@@ -12,7 +12,8 @@ class SemanticAnalyzer(NodeVisitor):
         self._current_function_table = None
 
     def visit_module(self, module):
-        self._current_module_table = SymbolTable(module.name, self.symbol_table)
+        self._current_module_table = SymbolTable(module.name,
+                                                 self.symbol_table)
         self.visit(module.source_file)
         self.visit(module.data_file)
         self._current_module_table = None

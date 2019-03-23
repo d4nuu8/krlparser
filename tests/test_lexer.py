@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# pylint: disable=too-many-public-methods
+
 from unittest import TestCase
 
 from krlparser.lexer import Lexer
@@ -29,18 +31,21 @@ class LexerTestCase(TestCase):
     def test_single_line_string(self):
         lexer = Lexer("\"Hello, World!\"")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.STRING, "Hello, World!", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.STRING, "Hello, World!", 0, 0),
+                         tokens[0])
 
     def test_multine_line_string_terminated_by_eof(self):
         lexer = Lexer("\"Hello, World!")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.STRING, "Hello, World!", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.STRING, "Hello, World!", 0, 0),
+                         tokens[0])
         self.assertEqual(TOKENS.ERROR_TOKEN, tokens[1].token_type)
 
     def test_multine_line_string_terminated_by_eol(self):
         lexer = Lexer("\"Hello, World!\n")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.STRING, "Hello, World!", 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.STRING, "Hello, World!", 0, 0),
+                         tokens[0])
         self.assertEqual(TOKENS.ERROR_TOKEN, tokens[1].token_type)
 
     def test_file_attribute(self):
@@ -84,7 +89,8 @@ class LexerTestCase(TestCase):
     def test_bin_digit(self):
         lexer = Lexer("'B1010'")
         tokens = lexer.generate_tokens()
-        self.assertEqual(Token(TOKENS.INTEGER, int("1010", 2), 0, 0), tokens[0])
+        self.assertEqual(Token(TOKENS.INTEGER, int("1010", 2), 0, 0),
+                         tokens[0])
         self.assertEqual(Token(TOKENS.END_OF_FILE, None, 0, 7), tokens[1])
 
     def test_integer(self):
@@ -187,9 +193,11 @@ class LexerTestCase(TestCase):
         lexer = Lexer("foo[bar]")
         tokens = lexer.generate_tokens()
         self.assertEqual(Token(TOKENS.ID, "foo", 0, 0), tokens[0])
-        self.assertEqual(Token(TOKENS.LEFT_SQUARE_BRACE, "[", 0, 3), tokens[1])
+        self.assertEqual(Token(TOKENS.LEFT_SQUARE_BRACE, "[", 0, 3),
+                         tokens[1])
         self.assertEqual(Token(TOKENS.ID, "bar", 0, 4), tokens[2])
-        self.assertEqual(Token(TOKENS.RIGHT_SQUARE_BRACE, "]", 0, 7), tokens[3])
+        self.assertEqual(Token(TOKENS.RIGHT_SQUARE_BRACE, "]", 0, 7),
+                         tokens[3])
 
     def test_enum_access(self):
         lexer = Lexer("foo = #bar")
@@ -206,4 +214,5 @@ class LexerTestCase(TestCase):
         self.assertEqual(Token(TOKENS.EQUAL, "=", 0, 4), tokens[1])
         self.assertEqual(Token(TOKENS.LEFT_CURLY_BRACE, "{", 0, 6), tokens[2])
         self.assertEqual(Token(TOKENS.ID, "bar", 0, 8), tokens[3])
-        self.assertEqual(Token(TOKENS.RIGHT_CURLY_BRACE, "}", 0, 12), tokens[4])
+        self.assertEqual(Token(TOKENS.RIGHT_CURLY_BRACE, "}", 0, 12),
+                         tokens[4])

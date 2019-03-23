@@ -40,7 +40,8 @@ class ParserTestCase(TestCase):
                                      parameter_type=Parameter.TYPE.OUT)]),
                        FunctionDefinition(name="Bar")]),
                    data_file=DataFile(name=module_name,
-                                      statements=[DataDefinition(name="Foo")]))]
+                                      statements=[DataDefinition(name="Foo")])
+                   )]
 
         parser = Parser()
         parser.add_module(module_name, source_file, data_file)
