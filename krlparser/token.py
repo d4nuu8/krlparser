@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+
 class Token:
     def __init__(self, token_type, value, line_number, column):
         self.token_type = token_type
@@ -45,6 +46,7 @@ class _Keywords:
     def __setattr__(self, *_):
         raise TypeError("Attribute is readonly!")
 
+
 KEYWORDS = _Keywords()
 
 
@@ -79,5 +81,6 @@ class _Tokens:
 
     def __setattr__(self, *_):
         raise TypeError("Attribute is readonly!")
+
 
 TOKENS = _Tokens()

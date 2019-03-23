@@ -3,8 +3,9 @@
 
 from unittest import TestCase
 
-from krlparser import Lexer
+from krlparser.lexer import Lexer
 from krlparser.token import Token, TOKENS
+
 
 class LexerTestCase(TestCase):
     def test_invalid_input(self):

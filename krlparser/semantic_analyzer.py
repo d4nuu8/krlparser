@@ -11,25 +11,20 @@ class SemanticAnalyzer(NodeVisitor):
         self._current_module_table = None
         self._current_function_table = None
 
-
     def visit_module(self, module):
         self._current_module_table = SymbolTable(module.name, self.symbol_table)
         self.visit(module.source_file)
         self.visit(module.data_file)
         self._current_module_table = None
 
-
     def visit_source_file(self, file):
         self.visit_file(file)
-
 
     def visit_data_file(self, file):
         self.visit_file(file)
 
-
     def visit_submit_file(self, file):
         self.visit_file(file)
-
 
     def visit_file(self, file):
         if (not self._current_module_table or
@@ -41,7 +36,6 @@ class SemanticAnalyzer(NodeVisitor):
 
         for statement in file.statements:
             self.visit(statement)
-
 
     def visit_function_definition(self, definition):
         self._current_module_table.add(
@@ -55,7 +49,6 @@ class SemanticAnalyzer(NodeVisitor):
 
         for statement in definition.body:
             self.visit(statement)
-
 
     def visit_data_definition(self, definition):
         if (not self._current_module_table or

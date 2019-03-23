@@ -16,11 +16,9 @@ class SymbolTableTestCase(TestCase):
         result = symbol_table.lookup("foo")
         self.assertEqual(symbol, result)
 
-
     def test_get_unknown_symbol(self):
         symbol_table = SymbolTable("GLOBAL", None)
         self.assertEqual(symbol_table.lookup("foo"), None)
-
 
     def test_get_symbol_from_parent(self):
         parent_scope = SymbolTable("GLOBAL", None)

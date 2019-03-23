@@ -16,7 +16,6 @@ class NodeVisitor(ABC):
             visitor = getattr(self, method_name, self.generic_visit)
             return visitor(nodes)
 
-
     @classmethod
     def generic_visit(cls, node):
         raise Exception(f"No visitor found for {type(node).__name__}")
@@ -25,7 +24,6 @@ class NodeVisitor(ABC):
 class AST(ABC):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
-
 
     def __ne_(self, other):
         return not self == other
@@ -38,7 +36,6 @@ class Module(AST):
         self.name = name
         self.source_file = source_file
         self.data_file = data_file
-
 
     def __repr__(self):
         return (f"Module(name={self.name}, "
@@ -55,7 +52,6 @@ class KrlFile(AST, ABC):
         self.file_attributes = file_attributes
         self.statements = statements
         self.symbol_table = symbol_table
-
 
     def __repr__(self):
         return (f"{self.__class__.__name__}("
@@ -81,7 +77,6 @@ class FileAttribute(AST):
 
         self.value = value
 
-
     def __repr__(self):
         return f"FileAttribute({self.value})"
 
@@ -96,7 +91,6 @@ class FunctionDefinition(AST):
         self.body = body
         self.returns = returns
         self.symbol_table = symbol_table
-
 
     def __repr__(self):
         return (f"FunctionDefinition("
@@ -115,7 +109,6 @@ class DataDefinition(AST):
         self.body = body
         self.symbol_table = symbol_table
 
-
     def __repr__(self):
         return (f"DataDefinition("
                 f"name={self.name}, "
@@ -130,12 +123,10 @@ class Parameter(AST):
         self.name = name
         self.parameter_type = parameter_type
 
-
     def __repr__(self):
         return (f"Parameter("
                 f"name={self.name}, "
                 f"parameter_type={self.parameter_type})")
-
 
     class TYPE(Enum):
         IN = auto()
@@ -149,7 +140,6 @@ class FunctionCall(AST):
         self.name = name
         self.parameters = parameters
 
-
     def __repr__(self):
         return (f"FunctionCall("
                 f"name={self.name}, "
@@ -162,7 +152,6 @@ class Type(AST):
 
         self.name = name
 
-
     def __repr__(self):
         return f"Type(name={self.name})"
 
@@ -171,7 +160,6 @@ class Symbol(AST, ABC):
     def __init__(self, *, name, symbol_type):
         self.name = name
         self.type = symbol_type
-
 
     def __repr__(self):
         return f"VariableSymbol(name={self.name}, type={self.type})"
@@ -187,13 +175,11 @@ class FunctionSymbol(Symbol):
 
         self.parameters = parameters
 
-
     @staticmethod
     def create_from_definition(definition):
         return FunctionSymbol(name=definition.name,
                               parameters=definition.parameters.copy(),
                               returns=definition.returns)
-
 
     def __repr__(self):
         return (f"FunctionSymbol("

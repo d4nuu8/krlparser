@@ -25,11 +25,9 @@ class Parser:
         self._position = 0
         self._current_token = None
 
-
     @property
     def ast(self):
         return self._ast
-
 
     def add_module(self, module_name, source_file, data_file):
         source_tokens = Lexer(source_file).generate_tokens()
@@ -45,13 +43,11 @@ class Parser:
                                source_file=source_file,
                                data_file=data_file))
 
-
     def add_source_file(self, name, source_file):
         source_tokens = Lexer(source_file).generate_tokens()
         self._initialize(source_tokens)
         source_file = self._src_file(name)
         self.ast.append(source_file)
-
 
     def add_data_file(self, name, data_file):
         data_tokens = Lexer(data_file).generate_tokens()
@@ -59,18 +55,15 @@ class Parser:
         data_file = self._dat_file(name)
         self.ast.append(data_file)
 
-
     def _initialize(self, tokens):
         self._tokens = tokens
         self._temp_ast = []
         self._position = 0
         self._current_token = self._tokens[self._position]
 
-
     def _error(self, message):
         token = self._current_token
         raise ParsingError(token.line_number, token.column, message)
-
 
     def _eat(self, token_type):
         token = self._current_token
@@ -80,7 +73,6 @@ class Parser:
 
         self._error(f"Expected \"{token_type}\", found \"{token.token_type}\"")
 
-
     def _try_eat(self, token_type):
         try:
             self._eat(token_type)
@@ -88,10 +80,8 @@ class Parser:
         except ParsingError:
             return False
 
-
     def _is_current_token(self, token_type):
         return self._current_token.token_type == token_type
-
 
     def _advance(self):
         self._position += 1
@@ -101,11 +91,9 @@ class Parser:
         else:
             self._current_token = self._tokens[self._position]
 
-
     def _skip_newlines(self):
         while self._try_eat(TOKENS.NEWLINE):
             pass
-
 
     def _src_file(self, name):
         attributes = self._file_attrs()
@@ -125,7 +113,6 @@ class Parser:
                           file_attributes=attributes,
                           statements=statements)
 
-
     def _dat_file(self, name):
         attributes = self._file_attrs()
         data_definition = self._dat_def()
@@ -139,7 +126,6 @@ class Parser:
                         file_attributes=attributes,
                         statements=[data_definition])
 
-
     def _file_attrs(self):
         attributes = []
         while self._current_token.token_type == TOKENS.FILE_ATTRIBUTE:
@@ -147,10 +133,8 @@ class Parser:
 
         return attributes or None
 
-
     def _file_attr(self):
         return self._eat(TOKENS.FILE_ATTRIBUTE)
-
 
     def _mod_def(self):
         self._skip_newlines()
@@ -178,7 +162,6 @@ class Parser:
                                       body=body)
 
         return None
-
 
     def _fnc_def(self):
         self._skip_newlines()
@@ -209,7 +192,6 @@ class Parser:
 
         return None
 
-
     def _dat_def(self):
         self._skip_newlines()
 
@@ -225,7 +207,6 @@ class Parser:
         self._skip_newlines()
         return DataDefinition(name=name.value)
 
-
     def _params_def(self):
         parameters = []
         if not self._is_current_token(TOKENS.ID):
@@ -238,7 +219,6 @@ class Parser:
 
         return parameters
 
-
     def _param_def(self):
         name = self._eat(TOKENS.ID)
         self._eat(TOKENS.COLON)
@@ -249,12 +229,10 @@ class Parser:
         elif self._try_eat(KEYWORDS.OUT):
             parameter_type = Parameter.TYPE.OUT
 
-
         if not parameter_type:
             self._error(f"Expected \"{KEYWORDS.IN}\" or \"{KEYWORDS.OUT}\"")
 
         return Parameter(name=name.value, parameter_type=parameter_type)
-
 
     def _body(self):
         body = []
@@ -268,7 +246,6 @@ class Parser:
 
         return body
 
-
     def _mod_call(self):
         function = self._eat(TOKENS.ID)
         self._eat(TOKENS.LEFT_BRACE)
@@ -277,7 +254,6 @@ class Parser:
         self._eat(TOKENS.NEWLINE)
 
         return FunctionCall(name=function.value, parameters=parameters)
-
 
     def _params(self):
         parameters = []
@@ -290,7 +266,6 @@ class Parser:
             parameters.append(self._param())
 
         return parameters
-
 
     def _param(self):
         return self._eat(TOKENS.ID).value

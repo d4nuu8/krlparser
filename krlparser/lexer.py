@@ -7,7 +7,7 @@ import string
 from .token import Token, TOKENS, KEYWORDS
 
 
-class Lexer: # pylint: disable=too-few-public-methods
+class Lexer:
     FIRST_CHARACTERS_ID = list(string.ascii_letters) + ["$", "_"]
 
     CHARACHTERS_ID = FIRST_CHARACTERS_ID + list(string.digits)
@@ -42,7 +42,6 @@ class Lexer: # pylint: disable=too-few-public-methods
             "{": lambda: operator(TOKENS.LEFT_CURLY_BRACE),
             "}": lambda: operator(TOKENS.RIGHT_CURLY_BRACE)
         }
-
 
     def __init__(self, code):
         if code is None or not isinstance(code, str):
@@ -107,7 +106,6 @@ class Lexer: # pylint: disable=too-few-public-methods
         self._advance()
         return Token(TOKENS.ERROR_TOKEN, "Unknown character sequence!",
                      self._line_number, self._column)
-
 
     def _advance(self):
         self._pos += 1
@@ -231,6 +229,7 @@ class Lexer: # pylint: disable=too-few-public-methods
         token = Token(token_type, value, self._line_number, self._column)
         self._advance()
         return token
+
 
 def get_public_attributes(target):
     return (name for name in dir(target) if not name.startswith("_"))

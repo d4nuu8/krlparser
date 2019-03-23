@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 from unittest import TestCase
 
 from krlparser.semantic_analyzer import SemanticAnalyzer
 from krlparser.symbol_table import SymbolTable
 from krlparser.parser import Parser
-from krlparser.ast import *
+from krlparser.ast import (FunctionDefinition, Parameter, Module, SourceFile,
+                           DataFile, DataDefinition, FunctionSymbol)
 
 
 class SymbolTableTestCase(TestCase):
@@ -71,5 +71,4 @@ class SymbolTableTestCase(TestCase):
         analyzer = SemanticAnalyzer()
         analyzer.visit(parser.ast)
 
-        self.maxDiff = None
         self.assertEqual(awaited_ast, parser.ast)
