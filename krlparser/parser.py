@@ -91,10 +91,6 @@ class Parser:
         else:
             self._current_token = self._tokens[self._position]
 
-    def _skip_newlines(self):
-        while self._try_eat(TOKENS.NEWLINE):
-            pass
-
     def _source_file(self, name):
         """
         source_file = (header
@@ -105,7 +101,7 @@ class Parser:
         statements = []
         while any(self._is_current_token(token) for token in
                   (KEYWORDS.GLOBAL, KEYWORDS.DEF, KEYWORDS.DEFFCT)):
-            definitions = (self._mod_def(), self._fnc_def())
+            definitions = (self._module_definition(), self._function_definition())
             for definition in filter(None, definitions):
                 statements.append(definition)
 
@@ -127,7 +123,7 @@ class Parser:
 
         statements = []
         while self._is_current_token(KEYWORDS.DEFDAT):
-            statements.append(self._dat_def())
+            statements.append(self._data_definition())
 
         if not statements:
             raise self._error("No data definition found")
@@ -149,12 +145,14 @@ class Parser:
             attributes.append(
                 FileAttribute(value=self._eat(TOKENS.FILE_ATTRIBUTE).value))
             self._eat(TOKENS.NEWLINE)
-            self._skip_newlines()
         return attributes
 
-    def _mod_def(self):
-        self._skip_newlines()
-
+    def _module_definition(self):
+        """
+        module_definition = (["GLOBAL"] "DEF" name "(" parameter_definitions ")" comment_or_newline
+                             statements
+                             "END" comment_or_newline)
+        """
         global_definition = self._try_eat(KEYWORDS.GLOBAL)
 
         if not self._is_current_token(KEYWORDS.DEF):
@@ -165,61 +163,59 @@ class Parser:
         self._eat(TOKENS.LEFT_BRACE)
         parameters = self._params_def()
         self._eat(TOKENS.RIGHT_BRACE)
-        self._eat(TOKENS.NEWLINE)
+        self._comment_or_newline()
 
-        self._skip_newlines()
-
-        body = self._body()
+        body = self._statements()
 
         self._eat(KEYWORDS.END)
+        self._comment_or_newline()
 
-        self._skip_newlines()
         return FunctionDefinition(name=name.value,
                                   parameters=parameters,
                                   body=body)
 
-    def _fnc_def(self):
-        self._skip_newlines()
-
+    def _function_definition(self):
+        """
+        function_definition = (["GLOBAL"] "DEFFCT" type name "(" parameter_definitions ")" comment_or_newline
+                               statements
+                               "END" comment_or_newline)
+        """
         global_definition = self._try_eat(KEYWORDS.GLOBAL)
 
         if not self._is_current_token(KEYWORDS.DEFFCT):
             return None
 
         self._eat(KEYWORDS.DEFFCT)
-
         return_type = self._eat(TOKENS.NAME)
         name = self._eat(TOKENS.NAME)
         self._eat(TOKENS.LEFT_BRACE)
         parameters = self._params_def()
         self._eat(TOKENS.RIGHT_BRACE)
-        self._eat(TOKENS.NEWLINE)
+        self._comment_or_newline()
 
-        self._skip_newlines()
-
-        body = self._body()
+        body = self._statements()
 
         self._eat(KEYWORDS.ENDFCT)
+        self._comment_or_newline()
 
-        self._skip_newlines()
         return FunctionDefinition(name=name.value,
                                   parameters=parameters,
                                   body=body,
                                   returns=Type(name=return_type.value))
 
-    def _dat_def(self):
-        self._skip_newlines()
-
+    def _data_definition(self):
+        """
+        data_definition = ("DEFDAT" name ["PUBLIC"] comment_or_newline
+                           "ENDDAT" comment_or_newline)
+        """
         self._eat(KEYWORDS.DEFDAT)
         name = self._eat(TOKENS.NAME)
         public_definition = self._try_eat(KEYWORDS.PUBLIC)
-        self._eat(TOKENS.NEWLINE)
-
-        self._skip_newlines()
+        self._comment_or_newline()
 
         self._eat(KEYWORDS.ENDDAT)
+        self._comment_or_newline()
 
-        self._skip_newlines()
         return DataDefinition(name=name.value)
 
     def _params_def(self):
@@ -249,17 +245,19 @@ class Parser:
 
         return Parameter(name=name.value, parameter_type=parameter_type)
 
-    def _body(self):
-        body = []
+    def _statements(self):
+        """
+        statements = *(module_call / comment_or_newline)
+        """
+        statements = []
         while True:
-            self._skip_newlines()
-
-            if self._is_current_token(TOKENS.NAME):
-                body.append(self._mod_call())
+            if any(self._is_current_token(token) for token in
+                   (TOKENS.COMMENT, TOKENS.NEWLINE)):
+                self._comment_or_newline()
             else:
                 break
 
-        return body
+        return statements
 
     def _mod_call(self):
         function = self._eat(TOKENS.NAME)
@@ -284,3 +282,15 @@ class Parser:
 
     def _param(self):
         return self._eat(TOKENS.NAME).value
+
+    def _comment_or_newline(self):
+        """
+        comment_or_newline = 1*([comment] newline)
+        """
+        self._try_eat(TOKENS.COMMENT)
+        self._eat(TOKENS.NEWLINE)
+
+        while any(self._is_current_token(token) for token in
+                  (TOKENS.COMMENT, TOKENS.NEWLINE)):
+            self._try_eat(TOKENS.COMMENT)
+            self._eat(TOKENS.NEWLINE)

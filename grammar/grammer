@@ -24,11 +24,11 @@ header = *(file_attribute 1*newline)
 file_attribute = "&" *(WSP / VCHAR)
 
 module_definition = (["GLOBAL"] "DEF" name "(" parameter_definitions ")" comment_or_newline
-                     *statements
+                     statements
                      "END" comment_or_newline)
 
 function_definition = (["GLOBAL"] "DEFFCT" type name "(" parameter_definitions ")" comment_or_newline
-                       *statements
+                       statements
                        "END" comment_or_newline)
 
 data_definition = ("DEFDAT" name ["PUBLIC"] comment_or_newline
@@ -38,7 +38,7 @@ parameter_definitions = [(parameter_definition [("," parameter_definition)])]
 
 parameter_definition = name ":" ("IN" / "OUT")
 
-statements = (module_call) comment_or_newline
+statements = *(module_call / comment_or_newline)
 
 module_call = name "(" parameters ")"
 
