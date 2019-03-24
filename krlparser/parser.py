@@ -6,15 +6,7 @@ from .token import TOKENS, KEYWORDS
 from .ast import (Module, SourceFile, DataFile, FileAttribute,
                   FunctionDefinition, DataDefinition,
                   Parameter, Type, FunctionCall)
-
-
-class ParsingError(Exception):
-    def __init__(self, line_number, column, message):
-        super().__init__(message)
-
-        self.line_number = line_number
-        self.column = column
-        self.message = message
+from .exceptions import ParsingError
 
 
 class Parser:

@@ -3,10 +3,11 @@
 
 import pytest
 
-from krlparser.parser import Parser, ParsingError
+from krlparser.parser import Parser
 from krlparser.ast import (Module, SourceFile, DataFile, FileAttribute,
                            FunctionDefinition, DataDefinition, Parameter, Type,
                            FunctionCall)
+from krlparser.exceptions import ParsingError
 
 
 def test_module_parsing():
