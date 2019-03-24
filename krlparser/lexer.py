@@ -59,10 +59,11 @@ class Lexer:
 
         while True:
             next_token = self._get_next_token()
-            token_list.append(next_token)
-
             if next_token.token_type == TOKENS.END_OF_FILE:
+                token_list.append(self._end_of_line())
+                token_list.append(next_token)
                 return token_list
+            token_list.append(next_token)
 
     def _get_next_token(self):
         token = None

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding(): utf-8 -*-
 
+import os
 import pytest
 
 from krlparser.lexer import Lexer
@@ -27,6 +28,13 @@ def test_peek_at_eol():
     tokens = lexer.generate_tokens()
     assert Token(TOKENS.NAME, "foo", 0, 0) == tokens[0]
     assert Token(TOKENS.EQUAL, "=", 0, 4) == tokens[1]
+
+
+def test_end_of_file():
+    lexer = Lexer("")
+    tokens = lexer.generate_tokens()
+    assert Token(TOKENS.NEWLINE, os.linesep, 0, 0) == tokens[0]
+    assert Token(TOKENS.END_OF_FILE, None, 0, 0) == tokens[1]
 
 
 def test_comment():
@@ -100,14 +108,12 @@ def test_bin_digit():
     lexer = Lexer("'B1010'")
     tokens = lexer.generate_tokens()
     assert Token(TOKENS.INTEGER, int("1010", 2), 0, 0) == tokens[0]
-    assert Token(TOKENS.END_OF_FILE, None, 0, 7) == tokens[1]
 
 
 def test_integer():
     lexer = Lexer("12345")
     tokens = lexer.generate_tokens()
     assert Token(TOKENS.INTEGER, 12345, 0, 0) == tokens[0]
-    assert Token(TOKENS.END_OF_FILE, None, 0, 5) == tokens[1]
 
 
 def test_real():
