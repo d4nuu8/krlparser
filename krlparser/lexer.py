@@ -23,6 +23,12 @@ class Lexer:
             ";": self._comment,
             "&": self._file_attribute,
             "\"": self._string,
+            "(": lambda: operator(TOKENS.LEFT_BRACE),
+            ")": lambda: operator(TOKENS.RIGHT_BRACE),
+            "[": lambda: operator(TOKENS.LEFT_SQUARE_BRACE),
+            "]": lambda: operator(TOKENS.RIGHT_SQUARE_BRACE),
+            "{": lambda: operator(TOKENS.LEFT_CURLY_BRACE),
+            "}": lambda: operator(TOKENS.RIGHT_CURLY_BRACE),
             "+": lambda: operator(TOKENS.PLUS),
             "-": lambda: operator(TOKENS.MINUS),
             "*": lambda: operator(TOKENS.STAR),
@@ -31,16 +37,9 @@ class Lexer:
             ",": lambda: operator(TOKENS.COMMA),
             ":": lambda: operator(TOKENS.COLON),
             "#": lambda: operator(TOKENS.HASH),
-            "=": lambda: operator(TOKENS.EQUAL),
-            "==": lambda: operator(TOKENS.EQUAL_EQUAL),
-            "<": lambda: operator(TOKENS.LESS),
-            ">": lambda: operator(TOKENS.GREATER),
-            "(": lambda: operator(TOKENS.LEFT_BRACE),
-            ")": lambda: operator(TOKENS.RIGHT_BRACE),
-            "[": lambda: operator(TOKENS.LEFT_SQUARE_BRACE),
-            "]": lambda: operator(TOKENS.RIGHT_SQUARE_BRACE),
-            "{": lambda: operator(TOKENS.LEFT_CURLY_BRACE),
-            "}": lambda: operator(TOKENS.RIGHT_CURLY_BRACE)
+            "=": self._equal,
+            ">": self._greater,
+            "<": self._less
         }
 
     def __init__(self, code):
@@ -115,6 +114,11 @@ class Lexer:
             self._current_char = None
         else:
             self._current_char = self._input[self._pos]
+
+    def _peek(self):
+        if self._pos > len(self._input):
+            return None
+        return self._input[self._pos + 1]
 
     def _end_of_file(self):
         return Token(TOKENS.END_OF_FILE, None, self._line_number, self._column)
@@ -224,6 +228,31 @@ class Lexer:
             return Token(TOKENS.REAL, float(value), self._line_number, start)
 
         return Token(TOKENS.INTEGER, int(value), self._line_number, start)
+
+    def _equal(self):
+        if self._peek() == "=":
+            token = self._create_token_at_position(TOKENS.EQUAL_EQUAL, "==")
+            self._advance()
+            return token
+        return self._create_token_at_position(TOKENS.EQUAL, "=")
+
+    def _greater(self):
+        if self._peek() == "=":
+            token = self._create_token_at_position(TOKENS.GREATER_EQUAL, ">=")
+            self._advance()
+            return token
+        return self._create_token_at_position(TOKENS.GREATER, ">")
+
+    def _less(self):
+        if self._peek() == "=":
+            token = self._create_token_at_position(TOKENS.LESS_EQUAL, "<=")
+            self._advance()
+            return token
+        if self._peek() == ">":
+            token = self._create_token_at_position(TOKENS.NOT_EQUAL, "<>")
+            self._advance()
+            return token
+        return self._create_token_at_position(TOKENS.LESS, "<")
 
     def _create_token_at_position(self, token_type, value):
         token = Token(token_type, value, self._line_number, self._column)

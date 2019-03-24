@@ -52,9 +52,11 @@ KEYWORDS = _Keywords()
 
 class _Tokens:
     NAME = "NAME"
-    STRING = "STRING"
     INTEGER = "INTEGER"
     REAL = "REAL"
+    STRING = "STRING"
+    COMMENT = "COMMENT"
+    FILE_ATTRIBUTE = "FILE_ATTRIBUTE"
     NEWLINE = "NEWLINE"
     END_OF_FILE = "END_OF_FILE"
     LEFT_BRACE = "("
@@ -73,10 +75,11 @@ class _Tokens:
     HASH = "#"
     EQUAL = "="
     EQUAL_EQUAL = "=="
-    LESS = "<"
+    NOT_EQUAL = "<>"
     GREATER = ">"
-    COMMENT = ";"
-    FILE_ATTRIBUTE = "&"
+    LESS = "<"
+    GREATER_EQUAL = ">="
+    LESS_EQUAL = "<="
     ERROR_TOKEN = "ERROR_TOKEN"
 
     def __setattr__(self, *_):

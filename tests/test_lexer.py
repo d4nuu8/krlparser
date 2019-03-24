@@ -121,38 +121,6 @@ def test_real():
     assert Token(TOKENS.REAL, 1.3E-3, 0, 0) == tokens[0]
 
 
-def test_addition():
-    lexer = Lexer("10 + 1")
-    tokens = lexer.generate_tokens()
-    assert Token(TOKENS.INTEGER, 10, 0, 0) == tokens[0]
-    assert Token(TOKENS.PLUS, "+", 0, 3) == tokens[1]
-    assert Token(TOKENS.INTEGER, 1, 0, 5) == tokens[2]
-
-
-def test_substraction():
-    lexer = Lexer("10 - 1")
-    tokens = lexer.generate_tokens()
-    assert Token(TOKENS.INTEGER, 10, 0, 0) == tokens[0]
-    assert Token(TOKENS.MINUS, "-", 0, 3) == tokens[1]
-    assert Token(TOKENS.INTEGER, 1, 0, 5) == tokens[2]
-
-
-def test_divison():
-    lexer = Lexer("10 / 1")
-    tokens = lexer.generate_tokens()
-    assert Token(TOKENS.INTEGER, 10, 0, 0) == tokens[0]
-    assert Token(TOKENS.SLASH, "/", 0, 3) == tokens[1]
-    assert Token(TOKENS.INTEGER, 1, 0, 5) == tokens[2]
-
-
-def test_multiplication():
-    lexer = Lexer("10 * 1")
-    tokens = lexer.generate_tokens()
-    assert Token(TOKENS.INTEGER, 10, 0, 0) == tokens[0]
-    assert Token(TOKENS.STAR, "*", 0, 3) == tokens[1]
-    assert Token(TOKENS.INTEGER, 1, 0, 5) == tokens[2]
-
-
 def test_structure_access():
     lexer = Lexer("foo.bar")
     tokens = lexer.generate_tokens()
@@ -172,20 +140,26 @@ def test_function_call():
     assert Token(TOKENS.RIGHT_BRACE, ")", 0, 13) == tokens[5]
 
 
-def test_greater_than():
-    lexer = Lexer("foo > bar")
+@pytest.mark.parametrize("token,string", [
+    (TOKENS.PLUS, "+"),
+    (TOKENS.MINUS, "-"),
+    (TOKENS.STAR, "*"),
+    (TOKENS.SLASH, "/"),
+    (TOKENS.COLON, ":"),
+    (TOKENS.EQUAL, "="),
+    (TOKENS.EQUAL_EQUAL, "=="),
+    (TOKENS.NOT_EQUAL, "<>"),
+    (TOKENS.GREATER, ">"),
+    (TOKENS.LESS, "<"),
+    (TOKENS.GREATER_EQUAL, ">="),
+    (TOKENS.LESS_EQUAL, "<=")
+])
+def test_binary_operators(token, string):
+    lexer = Lexer(f"foo {string} bar")
     tokens = lexer.generate_tokens()
     assert Token(TOKENS.NAME, "foo", 0, 0) == tokens[0]
-    assert Token(TOKENS.GREATER, ">", 0, 4) == tokens[1]
-    assert Token(TOKENS.NAME, "bar", 0, 6) == tokens[2]
-
-
-def test_less_than():
-    lexer = Lexer("foo < bar")
-    tokens = lexer.generate_tokens()
-    assert Token(TOKENS.NAME, "foo", 0, 0) == tokens[0]
-    assert Token(TOKENS.LESS, "<", 0, 4) == tokens[1]
-    assert Token(TOKENS.NAME, "bar", 0, 6) == tokens[2]
+    assert Token(token, string, 0, 4) == tokens[1]
+    assert Token(TOKENS.NAME, "bar", 0, 5 + len(string)) == tokens[2]
 
 
 def test_assign():
@@ -193,14 +167,6 @@ def test_assign():
     tokens = lexer.generate_tokens()
     assert Token(TOKENS.NAME, "foo", 0, 0) == tokens[0]
     assert Token(TOKENS.EQUAL, "=", 0, 4) == tokens[1]
-    assert Token(TOKENS.NAME, "bar", 0, 6) == tokens[2]
-
-
-def test_geometric_shift():
-    lexer = Lexer("foo : bar")
-    tokens = lexer.generate_tokens()
-    assert Token(TOKENS.NAME, "foo", 0, 0) == tokens[0]
-    assert Token(TOKENS.COLON, ":", 0, 4) == tokens[1]
     assert Token(TOKENS.NAME, "bar", 0, 6) == tokens[2]
 
 
