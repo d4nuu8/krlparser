@@ -22,6 +22,13 @@ def test_unknown_input():
     assert Token(TOKENS.NAME, "foo", 0, 1) == tokens[1]
 
 
+def test_peek_at_eol():
+    lexer = Lexer("foo =")
+    tokens = lexer.generate_tokens()
+    assert Token(TOKENS.NAME, "foo", 0, 0) == tokens[0]
+    assert Token(TOKENS.EQUAL, "=", 0, 4) == tokens[1]
+
+
 def test_comment():
     lexer = Lexer(";Test")
     tokens = lexer.generate_tokens()
