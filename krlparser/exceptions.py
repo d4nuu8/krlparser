@@ -3,7 +3,7 @@
 
 
 class ParsingError(Exception):
-    def __init__(self, line_number, column, message):
+    def __init__(self, *, line_number, column, message):
         super().__init__(message)
 
         self.line_number = line_number

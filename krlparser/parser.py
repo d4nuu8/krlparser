@@ -55,7 +55,9 @@ class Parser:
 
     def _error(self, message):
         token = self._current_token
-        raise ParsingError(token.line_number, token.column, message)
+        raise ParsingError(line_number=token.line_number,
+                           column=token.column,
+                           message=message)
 
     def _eat(self, token_type):
         token = self._current_token
