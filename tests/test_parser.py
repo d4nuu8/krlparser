@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from krlparser.parser import Parser
+import pytest
+
+from krlparser.parser import Parser, ParsingError
 from krlparser.ast import (Module, SourceFile, DataFile, FileAttribute,
-                           FunctionDefinition, DataDefinition, Parameter,
+                           FunctionDefinition, DataDefinition, Parameter, Type,
                            FunctionCall)
 
 
@@ -136,6 +138,62 @@ def test_file_attributes():
         SourceFile(name="Foo",
                    file_attributes=[FileAttribute(value="COMMENT Hello")],
                    statements=[FunctionDefinition(name="Foo")])]
+
+    parser = Parser()
+    parser.add_source_file("Foo", source_file)
+
+    assert awaited_ast == parser.ast
+
+
+def test_source_file_without_definition():
+    source_file = (
+        "&COMMENT Hello\n"
+    )
+
+    parser = Parser()
+    with pytest.raises(ParsingError):
+        parser.add_source_file("Foo", source_file)
+
+
+def test_data_file_without_definition():
+    data_file = (
+        "&COMMENT Hello\n"
+    )
+
+    parser = Parser()
+    with pytest.raises(ParsingError):
+        parser.add_data_file("Foo", data_file)
+
+
+def test_data_file_with_multiple_definitions():
+    data_file = (
+        "DEFDAT Foo\n"
+        "\n"
+        "ENDDAT"
+        "\n"
+        "DEFDAT Foo\n"
+        "\n"
+        "ENDDAT"
+    )
+
+    parser = Parser()
+    with pytest.raises(ParsingError):
+        parser.add_data_file("Foo", data_file)
+
+
+def test_source_file_with_single_function():
+    source_file = (
+        "DEFFCT INT Foo(bar:IN, foobar:OUT)\n"
+        "\n"
+        "ENDFCT"
+    )
+
+    awaited_ast = [
+        SourceFile(name="Foo", statements=[
+            FunctionDefinition(name="Foo", parameters=[
+                Parameter(name="bar", parameter_type=Parameter.TYPE.IN),
+                Parameter(name="foobar", parameter_type=Parameter.TYPE.OUT)
+            ], returns=Type(name="INT"))])]
 
     parser = Parser()
     parser.add_source_file("Foo", source_file)

@@ -103,16 +103,16 @@ class Parser:
         attributes = self._header()
 
         statements = []
-        statements.append(self._mod_def() or self._fnc_def())
-
-        if not statements:
-            raise self._error("No module or function definition found")
-
         while any(self._is_current_token(token) for token in
                   (KEYWORDS.GLOBAL, KEYWORDS.DEF, KEYWORDS.DEFFCT)):
             definitions = (self._mod_def(), self._fnc_def())
             for definition in filter(None, definitions):
                 statements.append(definition)
+
+        if not statements:
+            raise self._error("No module or function definition found")
+
+        self._eat(TOKENS.END_OF_FILE)
 
         return SourceFile(name=name,
                           file_attributes=attributes,
@@ -124,16 +124,21 @@ class Parser:
                      1data_definition)
         """
         attributes = self._header()
-        data_definition = self._dat_def()
 
-        if not data_definition:
+        statements = []
+        while self._is_current_token(KEYWORDS.DEFDAT):
+            statements.append(self._dat_def())
+
+        if not statements:
             raise self._error("No data definition found")
+        if len(statements) > 1:
+            raise self._error("More than one data definition found")
 
         self._eat(TOKENS.END_OF_FILE)
 
         return DataFile(name=name,
                         file_attributes=attributes,
-                        statements=[data_definition])
+                        statements=statements)
 
     def _header(self):
         """
@@ -152,56 +157,55 @@ class Parser:
 
         global_definition = self._try_eat(KEYWORDS.GLOBAL)
 
-        if self._current_token.token_type == KEYWORDS.DEF:
-            self._eat(KEYWORDS.DEF)
+        if not self._is_current_token(KEYWORDS.DEF):
+            return None
 
-            name = self._eat(TOKENS.NAME)
-            self._eat(TOKENS.LEFT_BRACE)
-            parameters = self._params_def()
-            self._eat(TOKENS.RIGHT_BRACE)
-            self._eat(TOKENS.NEWLINE)
+        self._eat(KEYWORDS.DEF)
+        name = self._eat(TOKENS.NAME)
+        self._eat(TOKENS.LEFT_BRACE)
+        parameters = self._params_def()
+        self._eat(TOKENS.RIGHT_BRACE)
+        self._eat(TOKENS.NEWLINE)
 
-            self._skip_newlines()
+        self._skip_newlines()
 
-            body = self._body()
+        body = self._body()
 
-            self._eat(KEYWORDS.END)
+        self._eat(KEYWORDS.END)
 
-            self._skip_newlines()
-            return FunctionDefinition(name=name.value,
-                                      parameters=parameters,
-                                      body=body)
-
-        return None
+        self._skip_newlines()
+        return FunctionDefinition(name=name.value,
+                                  parameters=parameters,
+                                  body=body)
 
     def _fnc_def(self):
         self._skip_newlines()
 
         global_definition = self._try_eat(KEYWORDS.GLOBAL)
 
-        if self._current_token.token_type == KEYWORDS.DEFFCT:
-            self._eat(KEYWORDS.DEFFCT)
+        if not self._is_current_token(KEYWORDS.DEFFCT):
+            return None
 
-            return_type = self._eat(TOKENS.NAME)
-            name = self._eat(TOKENS.NAME)
-            self._eat(TOKENS.LEFT_BRACE)
-            parameters = self._params_def()
-            self._eat(TOKENS.RIGHT_BRACE)
-            self._eat(TOKENS.NEWLINE)
+        self._eat(KEYWORDS.DEFFCT)
 
-            self._skip_newlines()
+        return_type = self._eat(TOKENS.NAME)
+        name = self._eat(TOKENS.NAME)
+        self._eat(TOKENS.LEFT_BRACE)
+        parameters = self._params_def()
+        self._eat(TOKENS.RIGHT_BRACE)
+        self._eat(TOKENS.NEWLINE)
 
-            body = self._body()
+        self._skip_newlines()
 
-            self._eat(KEYWORDS.ENDFCT)
+        body = self._body()
 
-            self._skip_newlines()
-            return FunctionDefinition(name=name.value,
-                                      parameters=parameters,
-                                      body=body,
-                                      returns=Type(name=return_type.value))
+        self._eat(KEYWORDS.ENDFCT)
 
-        return None
+        self._skip_newlines()
+        return FunctionDefinition(name=name.value,
+                                  parameters=parameters,
+                                  body=body,
+                                  returns=Type(name=return_type.value))
 
     def _dat_def(self):
         self._skip_newlines()
