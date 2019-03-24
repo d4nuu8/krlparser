@@ -188,7 +188,7 @@ class Lexer:
         if name.upper() in get_public_attributes(KEYWORDS):
             return Token(name.upper(), name, self._line_number, start)
 
-        return Token(TOKENS.ID, name, self._line_number, start)
+        return Token(TOKENS.NAME, name, self._line_number, start)
 
     def _number(self):
         start = self._column

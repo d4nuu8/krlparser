@@ -144,7 +144,7 @@ class Parser:
         if self._current_token.token_type == KEYWORDS.DEF:
             self._eat(KEYWORDS.DEF)
 
-            name = self._eat(TOKENS.ID)
+            name = self._eat(TOKENS.NAME)
             self._eat(TOKENS.LEFT_BRACE)
             parameters = self._params_def()
             self._eat(TOKENS.RIGHT_BRACE)
@@ -171,8 +171,8 @@ class Parser:
         if self._current_token.token_type == KEYWORDS.DEFFCT:
             self._eat(KEYWORDS.DEFFCT)
 
-            return_type = self._eat(TOKENS.ID)
-            name = self._eat(TOKENS.ID)
+            return_type = self._eat(TOKENS.NAME)
+            name = self._eat(TOKENS.NAME)
             self._eat(TOKENS.LEFT_BRACE)
             parameters = self._params_def()
             self._eat(TOKENS.RIGHT_BRACE)
@@ -196,7 +196,7 @@ class Parser:
         self._skip_newlines()
 
         self._eat(KEYWORDS.DEFDAT)
-        name = self._eat(TOKENS.ID)
+        name = self._eat(TOKENS.NAME)
         public_definition = self._try_eat(KEYWORDS.PUBLIC)
         self._eat(TOKENS.NEWLINE)
 
@@ -209,7 +209,7 @@ class Parser:
 
     def _params_def(self):
         parameters = []
-        if not self._is_current_token(TOKENS.ID):
+        if not self._is_current_token(TOKENS.NAME):
             return parameters
 
         parameters.append(self._param_def())
@@ -220,7 +220,7 @@ class Parser:
         return parameters
 
     def _param_def(self):
-        name = self._eat(TOKENS.ID)
+        name = self._eat(TOKENS.NAME)
         self._eat(TOKENS.COLON)
 
         parameter_type = None
@@ -239,7 +239,7 @@ class Parser:
         while True:
             self._skip_newlines()
 
-            if self._is_current_token(TOKENS.ID):
+            if self._is_current_token(TOKENS.NAME):
                 body.append(self._mod_call())
             else:
                 break
@@ -247,7 +247,7 @@ class Parser:
         return body
 
     def _mod_call(self):
-        function = self._eat(TOKENS.ID)
+        function = self._eat(TOKENS.NAME)
         self._eat(TOKENS.LEFT_BRACE)
         parameters = self._params()
         self._eat(TOKENS.RIGHT_BRACE)
@@ -257,7 +257,7 @@ class Parser:
 
     def _params(self):
         parameters = []
-        if not self._is_current_token(TOKENS.ID):
+        if not self._is_current_token(TOKENS.NAME):
             return parameters
 
         parameters.append(self._param())
@@ -268,4 +268,4 @@ class Parser:
         return parameters
 
     def _param(self):
-        return self._eat(TOKENS.ID).value
+        return self._eat(TOKENS.NAME).value

@@ -51,7 +51,7 @@ KEYWORDS = _Keywords()
 
 
 class _Tokens:
-    ID = "ID"
+    NAME = "NAME"
     STRING = "STRING"
     INTEGER = "INTEGER"
     REAL = "REAL"

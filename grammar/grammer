@@ -16,33 +16,36 @@ source_file = 1*(module_definition / function_definition)
 
 data_file = 1data_definition
 
-module_definition = (*1"GLOBAL" "DEF" name "(" parameter_definitions ")" newline
+module_definition = (*1"GLOBAL" "DEF" name "(" parameter_definitions ")" comment_or_newline
                      *statements
-                     "END" newline)
+                     "END" comment_or_newline)
 
-function_definition = (*1"GLOBAL" "DEFFCT" type name "(" parameter_definitions ")" newline
+function_definition = (*1"GLOBAL" "DEFFCT" type name "(" parameter_definitions ")" comment_or_newline
                        *statements
-                       "END" newline)
+                       "END" comment_or_newline)
 
-data_definition = ("DEFDAT" name *1"PUBLIC" newline
-                   "ENDDAT" newline)
+data_definition = ("DEFDAT" name *1"PUBLIC" comment_or_newline
+                   "ENDDAT" comment_or_newline)
 
 parameter_definitions = *1(parameter_definition *("," parameter_definition))
 
 parameter_definition = name ":" ("IN" / "OUT")
 
-statements = (module_call) newline
+statements = (module_call) comment_or_newline
 
 module_call = name "(" parameters ")"
 
 parameters = *1(name *("," name))
 
-type = identifier
+type = name
 
-name = identifier
+; Token NAME
+name = 1(ALPHA / "$" / "_") *23(ALPHA / DIGIT / "$" / "_")
 
-identifier = 1(ALPHA / "$" / "_") *23(ALPHA / DIGIT / "$" / "_")
+comment_or_newline = 1*(*comment (newline)
 
-newline = 1*(*comment (CRLF / CR / LF)
+; Token NEWLINE
+newline = CRLF / CR / LF
 
+; Token COMMENT
 comment = ";" *(WSP / VCHAR)
