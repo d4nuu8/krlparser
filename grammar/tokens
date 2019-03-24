@@ -1,1 +1,32 @@
 NAME
+INT
+REAL
+STRING
+COMMENT
+FILE_ATTRIBUTE
+NEWLINE
+END_OF_FILE
+
+LEFT_BRACE         "("
+RIGHT_BRACE        ")"
+LEFT_SQUARE_BRACE  "["
+RIGHT_SQUARE_BRACE "]"
+LEFT_CURLY_BRACE   "{"
+RIGHT_CURLY_BRACE  "}"
+PLUS               "+"
+MINUS              "-"
+STAR               "*"
+SLASH              "/"
+DOT                "."
+COMMA              ","
+COLON              ":"
+HASH               "#"
+EQUAL              "="
+EQUAL_EQUAL        "=="
+NOT_EQUAL          "<>"
+GREATER            ">"
+LESS               "<"
+GREATER_EQUAL      ">="
+LESS_EQUAL         "<="
+
+ERROR_TOKEN
