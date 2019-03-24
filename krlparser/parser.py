@@ -3,7 +3,7 @@
 
 from .lexer import Lexer
 from .token import TOKENS, KEYWORDS
-from .ast import (Module, SourceFile, DataFile,
+from .ast import (Module, SourceFile, DataFile, FileAttribute,
                   FunctionDefinition, DataDefinition,
                   Parameter, Type, FunctionCall)
 
@@ -141,13 +141,11 @@ class Parser:
         """
         attributes = []
         while self._current_token.token_type == TOKENS.FILE_ATTRIBUTE:
-            attributes.append(self._eat(TOKENS.FILE_ATTRIBUTE))
+            attributes.append(
+                FileAttribute(value=self._eat(TOKENS.FILE_ATTRIBUTE).value))
             self._eat(TOKENS.NEWLINE)
             self._skip_newlines()
         return attributes
-
-    def _file_attr(self):
-        return self._eat(TOKENS.FILE_ATTRIBUTE)
 
     def _mod_def(self):
         self._skip_newlines()

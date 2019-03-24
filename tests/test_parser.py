@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from krlparser.parser import Parser
-from krlparser.ast import (Module, SourceFile, DataFile,
+from krlparser.ast import (Module, SourceFile, DataFile, FileAttribute,
                            FunctionDefinition, DataDefinition, Parameter,
                            FunctionCall)
 
@@ -118,6 +118,24 @@ def test_mod_call():
                 Parameter(name="bar", parameter_type=Parameter.TYPE.IN)
             ]),
             FunctionDefinition(name="FooBar")])]
+
+    parser = Parser()
+    parser.add_source_file("Foo", source_file)
+
+    assert awaited_ast == parser.ast
+
+
+def test_file_attributes():
+    source_file = (
+        "&COMMENT Hello\n"
+        "DEF Foo()\n"
+        "END"
+    )
+
+    awaited_ast = [
+        SourceFile(name="Foo",
+                   file_attributes=[FileAttribute(value="COMMENT Hello")],
+                   statements=[FunctionDefinition(name="Foo")])]
 
     parser = Parser()
     parser.add_source_file("Foo", source_file)
