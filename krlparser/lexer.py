@@ -42,7 +42,7 @@ class Lexer:
             "<": self._less
         }
 
-    def __init__(self, code):
+    def __init__(self, *, code):
         if code is None or not isinstance(code, str):
             raise ValueError("Invalid input!")
 
@@ -104,8 +104,10 @@ class Lexer:
 
         # Error
         self._advance()
-        return Token(TOKENS.ERROR_TOKEN, "Unknown character sequence!",
-                     self._line_number, self._column)
+        return Token(token_type=TOKENS.ERROR_TOKEN,
+                     value="Unknown character sequence!",
+                     line_number=self._line_number,
+                     column=self._column)
 
     def _advance(self):
         self._pos += 1
@@ -122,11 +124,16 @@ class Lexer:
         return self._input[self._pos + 1]
 
     def _end_of_file(self):
-        return Token(TOKENS.END_OF_FILE, None, self._line_number, self._column)
+        return Token(token_type=TOKENS.END_OF_FILE,
+                     value=None,
+                     line_number=self._line_number,
+                     column=self._column)
 
     def _end_of_line(self):
-        token = Token(
-            TOKENS.NEWLINE, os.linesep, self._line_number, self._column)
+        token = Token(token_type=TOKENS.NEWLINE,
+                      value=os.linesep,
+                      line_number=self._line_number,
+                      column=self._column)
 
         self._advance()
         self._column = 0
@@ -139,13 +146,17 @@ class Lexer:
 
     def _comment(self):
         start = self._column
-        return Token(
-            TOKENS.COMMENT, self._read_line(), self._line_number, start)
+        return Token(token_type=TOKENS.COMMENT,
+                     value=self._read_line(),
+                     line_number=self._line_number,
+                     column=start)
 
     def _file_attribute(self):
         start = self._column
-        return Token(
-            TOKENS.FILE_ATTRIBUTE, self._read_line(), self._line_number, start)
+        return Token(token_type=TOKENS.FILE_ATTRIBUTE,
+                     value=self._read_line(),
+                     line_number=self._line_number,
+                     column=start)
 
     def _read_line(self):
         self._advance()
@@ -162,8 +173,10 @@ class Lexer:
         value = ""
         while True:
             if self._current_char is None or self._current_char == os.linesep:
-                token = Token(TOKENS.ERROR_TOKEN, "Unexpected newline!",
-                              self._line_number, self._column)
+                token = Token(token_type=TOKENS.ERROR_TOKEN,
+                              value="Unexpected newline!",
+                              line_number=self._line_number,
+                              column=self._column)
                 self._error.append(token)
                 return value
 
@@ -178,8 +191,10 @@ class Lexer:
         start = self._column
         self._advance()
 
-        return Token(TOKENS.STRING, self._read_until(["\""]),
-                     self._line_number, start)
+        return Token(token_type=TOKENS.STRING,
+                     value=self._read_until(["\""]),
+                     line_number=self._line_number,
+                     column=start)
 
     def _name(self):
         start = self._column
@@ -191,9 +206,15 @@ class Lexer:
             self._advance()
 
         if name.upper() in get_public_attributes(KEYWORDS):
-            return Token(name.upper(), name, self._line_number, start)
+            return Token(token_type=name.upper(),
+                         value=name,
+                         line_number=self._line_number,
+                         column=start)
 
-        return Token(TOKENS.NAME, name, self._line_number, start)
+        return Token(token_type=TOKENS.NAME,
+                     value=name,
+                     line_number=self._line_number,
+                     column=start)
 
     def _number(self):
         start = self._column
@@ -212,11 +233,15 @@ class Lexer:
             value = self._read_until("'")
 
             try:
-                return Token(TOKENS.INTEGER, int(value, base),
-                             self._line_number, start)
+                return Token(token_type=TOKENS.INTEGER,
+                             value=int(value, base),
+                             line_number=self._line_number,
+                             column=start)
             except ValueError:
-                return Token(TOKENS.ERROR_TOKEN, "Invalid syntax!",
-                             self._line_number, start)
+                return Token(token_type=TOKENS.ERROR_TOKEN,
+                             value="Invalid syntax!",
+                             line_number=self._line_number,
+                             column=start)
 
         value = ""
         while (self._current_char is not None and
@@ -226,9 +251,15 @@ class Lexer:
             self._advance()
 
         if any((char in ["E", "e", "."]) for char in value):
-            return Token(TOKENS.REAL, float(value), self._line_number, start)
+            return Token(token_type=TOKENS.REAL,
+                         value=float(value),
+                         line_number=self._line_number,
+                         column=start)
 
-        return Token(TOKENS.INTEGER, int(value), self._line_number, start)
+        return Token(token_type=TOKENS.INTEGER,
+                     value=int(value),
+                     line_number=self._line_number,
+                     column=start)
 
     def _equal(self):
         if self._peek() == "=":
@@ -256,7 +287,10 @@ class Lexer:
         return self._create_token_at_position(TOKENS.LESS, "<")
 
     def _create_token_at_position(self, token_type, value):
-        token = Token(token_type, value, self._line_number, self._column)
+        token = Token(token_type=token_type,
+                      value=value,
+                      line_number=self._line_number,
+                      column=self._column)
         self._advance()
         return token
 

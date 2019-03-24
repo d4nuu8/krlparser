@@ -3,7 +3,7 @@
 
 
 class SymbolTable:
-    def __init__(self, name, parent_scope):
+    def __init__(self, *, name, parent_scope):
         self.name = name
         self.parent_scope = parent_scope
         self._symbols = {}

@@ -3,7 +3,7 @@
 
 
 class Token:
-    def __init__(self, token_type, value, line_number, column):
+    def __init__(self, *, token_type, value, line_number, column):
         self.token_type = token_type
         self.value = value
         self.line_number = line_number

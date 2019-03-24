@@ -22,8 +22,8 @@ class Parser:
         return self._ast
 
     def add_module(self, module_name, source_file, data_file):
-        source_tokens = Lexer(source_file).generate_tokens()
-        data_tokens = Lexer(data_file).generate_tokens()
+        source_tokens = Lexer(code=source_file).generate_tokens()
+        data_tokens = Lexer(code=data_file).generate_tokens()
 
         self._initialize(source_tokens)
         source_file = self._source_file(module_name)
@@ -36,13 +36,13 @@ class Parser:
                                data_file=data_file))
 
     def add_source_file(self, name, source_file):
-        source_tokens = Lexer(source_file).generate_tokens()
+        source_tokens = Lexer(code=source_file).generate_tokens()
         self._initialize(source_tokens)
         source_file = self._source_file(name)
         self.ast.append(source_file)
 
     def add_data_file(self, name, data_file):
-        data_tokens = Lexer(data_file).generate_tokens()
+        data_tokens = Lexer(code=data_file).generate_tokens()
         self._initialize(data_tokens)
         data_file = self._data_file(name)
         self.ast.append(data_file)

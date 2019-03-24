@@ -28,10 +28,13 @@ def test_simple_module_definition():
         "ENDDAT"
     )
 
-    global_symbol_table = SymbolTable("GLOBAL", None)
-    module_symbol_table = SymbolTable("Foo", global_symbol_table)
-    function1_symbol_table = SymbolTable("Foo.Foo", module_symbol_table)
-    function2_symbol_table = SymbolTable("Foo.Bar", module_symbol_table)
+    global_symbol_table = SymbolTable(name="GLOBAL", parent_scope=None)
+    module_symbol_table = SymbolTable(name="Foo",
+                                      parent_scope=global_symbol_table)
+    function1_symbol_table = SymbolTable(name="Foo.Foo",
+                                         parent_scope=module_symbol_table)
+    function2_symbol_table = SymbolTable(name="Foo.Bar",
+                                         parent_scope=module_symbol_table)
 
     function_definition1 = FunctionDefinition(
         name="Foo",
