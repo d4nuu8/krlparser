@@ -162,14 +162,6 @@ def test_binary_operators(token, string):
     assert Token(TOKENS.NAME, "bar", 0, 5 + len(string)) == tokens[2]
 
 
-def test_assign():
-    lexer = Lexer("foo = bar")
-    tokens = lexer.generate_tokens()
-    assert Token(TOKENS.NAME, "foo", 0, 0) == tokens[0]
-    assert Token(TOKENS.EQUAL, "=", 0, 4) == tokens[1]
-    assert Token(TOKENS.NAME, "bar", 0, 6) == tokens[2]
-
-
 def test_array_access():
     lexer = Lexer("foo[bar]")
     tokens = lexer.generate_tokens()
