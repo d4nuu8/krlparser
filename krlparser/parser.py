@@ -271,7 +271,7 @@ class Parser:
         while True:
             if (self._is_current_token(TOKENS.NAME) and
                self._is_next_token(TOKENS.LEFT_BRACE)):
-                statements.append(self._mod_call())
+                statements.append(self._module_call())
             elif any(self._is_current_token(token) for token in
                      (TOKENS.COMMENT, TOKENS.NEWLINE)):
                 self._comment_or_newline()
@@ -280,16 +280,20 @@ class Parser:
 
         return statements
 
-    def _mod_call(self):
+    def _module_call(self):
+        """
+        module_call = name "(" parameters ")"
+        """
         function = self._eat(TOKENS.NAME)
         self._eat(TOKENS.LEFT_BRACE)
-        parameters = self._params()
+        parameters = self._parameters()
         self._eat(TOKENS.RIGHT_BRACE)
-        self._eat(TOKENS.NEWLINE)
-
         return FunctionCall(name=function.value, parameters=parameters)
 
-    def _params(self):
+    def _parameters(self):
+        """
+        parameters = [(name *("," name))]
+        """
         parameters = []
         if not self._is_current_token(TOKENS.NAME):
             return parameters
