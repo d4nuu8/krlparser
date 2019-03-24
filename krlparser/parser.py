@@ -99,6 +99,10 @@ class Parser:
         else:
             self._current_token = self._tokens[self._position]
 
+    # =========================================================================
+    #                            Grammar definitions
+    # =========================================================================
+
     def _source_file(self, name):
         """
         source_file = (header
@@ -290,15 +294,12 @@ class Parser:
         if not self._is_current_token(TOKENS.NAME):
             return parameters
 
-        parameters.append(self._param())
+        parameters.append(self._eat(TOKENS.NAME).value)
 
         while self._try_eat(TOKENS.COMMA):
-            parameters.append(self._param())
+            parameters.append(self._eat(TOKENS.NAME).value)
 
         return parameters
-
-    def _param(self):
-        return self._eat(TOKENS.NAME).value
 
     def _comment_or_newline(self):
         """
