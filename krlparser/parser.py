@@ -169,7 +169,7 @@ class Parser:
         self._eat(KEYWORDS.DEF)
         name = self._eat(TOKENS.NAME)
         self._eat(TOKENS.LEFT_BRACE)
-        parameters = self._params_def()
+        parameters = self._parameter_definitions()
         self._eat(TOKENS.RIGHT_BRACE)
         self._comment_or_newline()
 
@@ -197,7 +197,7 @@ class Parser:
         return_type = self._eat(TOKENS.NAME)
         name = self._eat(TOKENS.NAME)
         self._eat(TOKENS.LEFT_BRACE)
-        parameters = self._params_def()
+        parameters = self._parameter_definitions()
         self._eat(TOKENS.RIGHT_BRACE)
         self._comment_or_newline()
 
@@ -226,19 +226,25 @@ class Parser:
 
         return DataDefinition(name=name.value)
 
-    def _params_def(self):
+    def _parameter_definitions(self):
+        """
+        parameter_definitions = [(parameter_definition [("," parameter_definition)])]
+        """
         parameters = []
         if not self._is_current_token(TOKENS.NAME):
             return parameters
 
-        parameters.append(self._param_def())
+        parameters.append(self._parameter_definition())
 
         while self._try_eat(TOKENS.COMMA):
-            parameters.append(self._param_def())
+            parameters.append(self._parameter_definition())
 
         return parameters
 
-    def _param_def(self):
+    def _parameter_definition(self):
+        """
+        parameter_definition = name ":" ("IN" / "OUT")
+        """
         name = self._eat(TOKENS.NAME)
         self._eat(TOKENS.COLON)
 
