@@ -80,8 +80,16 @@ class Parser:
         except ParsingError:
             return False
 
+    def _peek(self):
+        if self._position > len(self._tokens) - 2:
+            return None
+        return self._tokens[self._position + 1]
+
     def _is_current_token(self, token_type):
         return self._current_token.token_type == token_type
+
+    def _is_next_token(self, token_type):
+        return self._peek().token_type == token_type
 
     def _advance(self):
         self._position += 1
@@ -251,8 +259,11 @@ class Parser:
         """
         statements = []
         while True:
-            if any(self._is_current_token(token) for token in
-                   (TOKENS.COMMENT, TOKENS.NEWLINE)):
+            if (self._is_current_token(TOKENS.NAME) and
+               self._is_next_token(TOKENS.LEFT_BRACE)):
+                statements.append(self._mod_call())
+            elif any(self._is_current_token(token) for token in
+                     (TOKENS.COMMENT, TOKENS.NEWLINE)):
                 self._comment_or_newline()
             else:
                 break
