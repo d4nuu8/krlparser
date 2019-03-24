@@ -34,10 +34,10 @@ class Parser:
         data_tokens = Lexer(data_file).generate_tokens()
 
         self._initialize(source_tokens)
-        source_file = self._src_file(module_name)
+        source_file = self._source_file(module_name)
 
         self._initialize(data_tokens)
-        data_file = self._dat_file(module_name)
+        data_file = self._data_file(module_name)
 
         self.ast.append(Module(name=module_name,
                                source_file=source_file,
@@ -46,13 +46,13 @@ class Parser:
     def add_source_file(self, name, source_file):
         source_tokens = Lexer(source_file).generate_tokens()
         self._initialize(source_tokens)
-        source_file = self._src_file(name)
+        source_file = self._source_file(name)
         self.ast.append(source_file)
 
     def add_data_file(self, name, data_file):
         data_tokens = Lexer(data_file).generate_tokens()
         self._initialize(data_tokens)
-        data_file = self._dat_file(name)
+        data_file = self._data_file(name)
         self.ast.append(data_file)
 
     def _initialize(self, tokens):
@@ -95,8 +95,13 @@ class Parser:
         while self._try_eat(TOKENS.NEWLINE):
             pass
 
-    def _src_file(self, name):
-        attributes = self._file_attrs()
+    def _source_file(self, name):
+        """
+        source_file = (header
+                       1*(module_definition / function_definition))
+        """
+        attributes = self._header()
+
         statements = []
         statements.append(self._mod_def() or self._fnc_def())
 
@@ -113,8 +118,12 @@ class Parser:
                           file_attributes=attributes,
                           statements=statements)
 
-    def _dat_file(self, name):
-        attributes = self._file_attrs()
+    def _data_file(self, name):
+        """
+        data_file = (header
+                     1data_definition)
+        """
+        attributes = self._header()
         data_definition = self._dat_def()
 
         if not data_definition:
@@ -126,12 +135,16 @@ class Parser:
                         file_attributes=attributes,
                         statements=[data_definition])
 
-    def _file_attrs(self):
+    def _header(self):
+        """
+        header = *(file_attribute 1*newline)
+        """
         attributes = []
         while self._current_token.token_type == TOKENS.FILE_ATTRIBUTE:
-            attributes.append(self._file_attr())
-
-        return attributes or None
+            attributes.append(self._eat(TOKENS.FILE_ATTRIBUTE))
+            self._eat(TOKENS.NEWLINE)
+            self._skip_newlines()
+        return attributes
 
     def _file_attr(self):
         return self._eat(TOKENS.FILE_ATTRIBUTE)

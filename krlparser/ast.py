@@ -44,7 +44,7 @@ class Module(AST):
 
 
 class KrlFile(AST, ABC):
-    def __init__(self, *, name, file_attributes=None, statements=[],
+    def __init__(self, *, name, file_attributes=[], statements=[],
                  symbol_table=None):
         super().__init__()
 

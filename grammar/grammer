@@ -12,9 +12,16 @@
 # submit_file for *.sub files
 
 
-source_file = 1*(module_definition / function_definition)
+source_file = (header
+               1*(module_definition / function_definition))
 
-data_file = 1data_definition
+data_file = (header
+             1data_definition)
+
+header = *(file_attribute 1*newline)
+
+; Token FILE_ATTRIBUTE
+file_attribute = "&" *(WSP / VCHAR)
 
 module_definition = (["GLOBAL"] "DEF" name "(" parameter_definitions ")" comment_or_newline
                      *statements
@@ -42,7 +49,16 @@ type = name
 ; Token NAME
 name = 1(ALPHA / "$" / "_") *23(ALPHA / DIGIT / "$" / "_")
 
-comment_or_newline = 1*(*comment (newline)
+; Token INTEGER
+integer_number = ; TODO
+
+; Token REAL
+floating_number = ; TODO
+
+; Token STRING
+string = DQUOTE *(%x20-21 / %x23-7E) DQUOTE
+
+comment_or_newline = 1*([comment] newline)
 
 ; Token NEWLINE
 newline = CRLF / CR / LF
