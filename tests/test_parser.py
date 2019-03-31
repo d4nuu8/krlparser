@@ -37,7 +37,8 @@ def test_module_parsing():
                        Parameter(name="bar",
                                  parameter_type=Parameter.TYPE.IN),
                        Parameter(name="foobar",
-                                 parameter_type=Parameter.TYPE.OUT)]),
+                                 parameter_type=Parameter.TYPE.OUT)],
+                       is_global=True),
                    FunctionDefinition(name="Bar")]),
                data_file=DataFile(name=module_name,
                                   statements=[DataDefinition(name="Foo")])
@@ -66,7 +67,7 @@ def test_source_parsing():
             FunctionDefinition(name="Foo", parameters=[
                 Parameter(name="bar", parameter_type=Parameter.TYPE.IN),
                 Parameter(name="foobar", parameter_type=Parameter.TYPE.OUT)
-            ]),
+            ], is_global=True),
             FunctionDefinition(name="Bar")
         ])]
 

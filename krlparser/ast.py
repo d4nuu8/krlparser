@@ -83,13 +83,14 @@ class FileAttribute(AST):
 
 class FunctionDefinition(AST):
     def __init__(self, *, name, parameters=[], body=[], returns=None,
-                 symbol_table=None):
+                 is_global=False, symbol_table=None):
         super().__init__()
 
         self.name = name
         self.parameters = parameters
         self.body = body
         self.returns = returns
+        self.is_global = is_global
         self.symbol_table = symbol_table
 
     def __repr__(self):
@@ -98,6 +99,7 @@ class FunctionDefinition(AST):
                 f"parameters={self.parameters}, "
                 f"body={self.body}, "
                 f"returns={self.returns}, "
+                f"is_global={self.is_global}, "
                 f"symbol_table={self.symbol_table})")
 
 

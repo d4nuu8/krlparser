@@ -42,6 +42,7 @@ def test_simple_module_definition():
                               parameter_type=Parameter.TYPE.IN),
                     Parameter(name="foobar",
                               parameter_type=Parameter.TYPE.OUT)],
+        is_global=True,
         symbol_table=function1_symbol_table)
 
     function_definition2 = FunctionDefinition(

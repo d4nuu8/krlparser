@@ -180,7 +180,8 @@ class Parser:
 
         return FunctionDefinition(name=name.value,
                                   parameters=parameters,
-                                  body=body)
+                                  body=body,
+                                  is_global=global_definition)
 
     def _function_definition(self):
         """
@@ -210,7 +211,8 @@ class Parser:
         return FunctionDefinition(name=name.value,
                                   parameters=parameters,
                                   body=body,
-                                  returns=Type(name=return_type.value))
+                                  returns=Type(name=return_type.value),
+                                  is_global=global_definition)
 
     def _data_definition(self):
         """
