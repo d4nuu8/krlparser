@@ -6,7 +6,7 @@ import pytest
 from krlparser.parser import Parser
 from krlparser.ast import (Module, SourceFile, DataFile, FileAttribute,
                            FunctionDefinition, DataDefinition, Parameter, Type,
-                           FunctionCall)
+                           FunctionCall, VariableSymbol)
 from krlparser.exceptions import ParsingError
 
 
@@ -213,3 +213,44 @@ def test_module_with_invalid_parameter_type():
     parser = Parser()
     with pytest.raises(ParsingError):
         parser.add_source_file("Foo", source_file)
+
+
+def test_simple_variable_declartion():
+    source_file = (
+        "DEF Foo()\n"
+        "DECL INT bar\n"
+        "END"
+    )
+
+    awaited_ast = [
+        SourceFile(name="Foo", statements=[
+            FunctionDefinition(name="Foo", body=[
+                VariableSymbol(name="bar", symbol_type="INT")])
+        ])]
+
+    parser = Parser()
+    parser.add_source_file("Foo", source_file)
+
+    assert awaited_ast == parser.ast
+
+
+def test_chained_variable_declartion():
+    source_file = (
+        "DEF Foo()\n"
+        "DECL INT bar1, bar2, bar3\n"
+        "END"
+    )
+
+    awaited_ast = [
+        SourceFile(name="Foo", statements=[
+            FunctionDefinition(name="Foo", body=[
+                VariableSymbol(name="bar1", symbol_type="INT"),
+                VariableSymbol(name="bar2", symbol_type="INT"),
+                VariableSymbol(name="bar3", symbol_type="INT")
+            ])
+        ])]
+
+    parser = Parser()
+    parser.add_source_file("Foo", source_file)
+
+    assert awaited_ast == parser.ast

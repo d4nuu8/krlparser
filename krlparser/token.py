@@ -42,6 +42,7 @@ class _Keywords:
     END = "END"
     ENDFCT = "ENDFCT"
     ENDDAT = "ENDDAT"
+    DECL = "DECL"
 
     def __setattr__(self, *_):
         raise TypeError("Attribute is readonly!")

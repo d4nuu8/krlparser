@@ -5,7 +5,7 @@ from .lexer import Lexer
 from .token import TOKENS, KEYWORDS
 from .ast import (Module, SourceFile, DataFile, FileAttribute,
                   FunctionDefinition, DataDefinition,
-                  Parameter, Type, FunctionCall)
+                  Parameter, Type, FunctionCall, VariableSymbol)
 from .exceptions import ParsingError
 
 
@@ -158,6 +158,7 @@ class Parser:
         """
         module_definition = ["GLOBAL"] "DEF" name
                             "(" parameter_definitions ")" comment_or_newline
+                            variable_declarations_source
                             statements
                             "END" comment_or_newline
         """
@@ -173,6 +174,8 @@ class Parser:
         self._eat(TOKENS.RIGHT_BRACE)
         self._comment_or_newline()
 
+        variable_declarations = self._variable_declarations_source()
+
         body = self._statements()
 
         self._eat(KEYWORDS.END)
@@ -180,13 +183,14 @@ class Parser:
 
         return FunctionDefinition(name=name.value,
                                   parameters=parameters,
-                                  body=body,
+                                  body=variable_declarations + body,
                                   is_global=global_definition)
 
     def _function_definition(self):
         """
         function_definition = ["GLOBAL"] "DEFFCT" type name
                               "(" parameter_definitions ")" comment_or_newline
+                              variable_declarations_source
                               statements
                               "END" comment_or_newline
         """
@@ -203,6 +207,8 @@ class Parser:
         self._eat(TOKENS.RIGHT_BRACE)
         self._comment_or_newline()
 
+        variable_declarations = self._variable_declarations_source()
+
         body = self._statements()
 
         self._eat(KEYWORDS.ENDFCT)
@@ -210,7 +216,7 @@ class Parser:
 
         return FunctionDefinition(name=name.value,
                                   parameters=parameters,
-                                  body=body,
+                                  body=variable_declarations + body,
                                   returns=Type(name=return_type.value),
                                   is_global=global_definition)
 
@@ -262,6 +268,27 @@ class Parser:
             self._error(f"Expected \"{KEYWORDS.IN}\" or \"{KEYWORDS.OUT}\"")
 
         return Parameter(name=name.value, parameter_type=parameter_type)
+
+    def _variable_declarations_source(self):
+        """
+        [DECL] type name [array] *("," name [array])
+        """
+        declarations = []
+
+        if self._try_eat(KEYWORDS.DECL):
+            symbol_type = self._eat(TOKENS.NAME).value
+            declarations.append(VariableSymbol(
+                name=self._eat(TOKENS.NAME).value,
+                symbol_type=symbol_type
+            ))
+
+        while self._try_eat(TOKENS.COMMA):
+            declarations.append(VariableSymbol(
+                name=self._eat(TOKENS.NAME).value,
+                symbol_type=symbol_type
+            ))
+
+        return declarations
 
     def _statements(self):
         """
