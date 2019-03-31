@@ -200,3 +200,15 @@ def test_source_file_with_single_function():
     parser.add_source_file("Foo", source_file)
 
     assert awaited_ast == parser.ast
+
+
+def test_module_with_invalid_parameter_type():
+    source_file = (
+        "DEFFCT INT Foo(bar:invalid)\n"
+        "\n"
+        "ENDFCT"
+    )
+
+    parser = Parser()
+    with pytest.raises(ParsingError):
+        parser.add_source_file("Foo", source_file)
