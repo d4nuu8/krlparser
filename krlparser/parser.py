@@ -107,7 +107,8 @@ class Parser:
         statements = []
         while any(self._is_current_token(token) for token in
                   (KEYWORDS.GLOBAL, KEYWORDS.DEF, KEYWORDS.DEFFCT)):
-            definitions = (self._module_definition(), self._function_definition())
+            definitions = (self._module_definition(),
+                           self._function_definition())
             for definition in filter(None, definitions):
                 statements.append(definition)
 
@@ -155,7 +156,8 @@ class Parser:
 
     def _module_definition(self):
         """
-        module_definition = (["GLOBAL"] "DEF" name "(" parameter_definitions ")" comment_or_newline
+        module_definition = (["GLOBAL"] "DEF" name
+                             "(" parameter_definitions ")" comment_or_newline
                              statements
                              "END" comment_or_newline)
         """
@@ -182,7 +184,8 @@ class Parser:
 
     def _function_definition(self):
         """
-        function_definition = (["GLOBAL"] "DEFFCT" type name "(" parameter_definitions ")" comment_or_newline
+        function_definition = (["GLOBAL"] "DEFFCT" type name
+                               "(" parameter_definitions ")" comment_or_newline
                                statements
                                "END" comment_or_newline)
         """
@@ -226,7 +229,8 @@ class Parser:
 
     def _parameter_definitions(self):
         """
-        parameter_definitions = [(parameter_definition [("," parameter_definition)])]
+        parameter_definitions = ([(parameter_definition
+                                 [("," parameter_definition)])])
         """
         parameters = []
         if not self._is_current_token(TOKENS.NAME):
