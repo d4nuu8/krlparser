@@ -99,8 +99,8 @@ class Parser:
 
     def _source_file(self, name):
         """
-        source_file = (header
-                       1*(module_definition / function_definition))
+        source_file = header
+                      1*(module_definition / function_definition)
         """
         attributes = self._header()
 
@@ -123,8 +123,8 @@ class Parser:
 
     def _data_file(self, name):
         """
-        data_file = (header
-                     1data_definition)
+        data_file = header
+                    1data_definition
         """
         attributes = self._header()
 
@@ -156,10 +156,10 @@ class Parser:
 
     def _module_definition(self):
         """
-        module_definition = (["GLOBAL"] "DEF" name
-                             "(" parameter_definitions ")" comment_or_newline
-                             statements
-                             "END" comment_or_newline)
+        module_definition = ["GLOBAL"] "DEF" name
+                            "(" parameter_definitions ")" comment_or_newline
+                            statements
+                            "END" comment_or_newline
         """
         global_definition = self._try_eat(KEYWORDS.GLOBAL)
 
@@ -185,10 +185,10 @@ class Parser:
 
     def _function_definition(self):
         """
-        function_definition = (["GLOBAL"] "DEFFCT" type name
-                               "(" parameter_definitions ")" comment_or_newline
-                               statements
-                               "END" comment_or_newline)
+        function_definition = ["GLOBAL"] "DEFFCT" type name
+                              "(" parameter_definitions ")" comment_or_newline
+                              statements
+                              "END" comment_or_newline
         """
         global_definition = self._try_eat(KEYWORDS.GLOBAL)
 
@@ -216,8 +216,8 @@ class Parser:
 
     def _data_definition(self):
         """
-        data_definition = ("DEFDAT" name ["PUBLIC"] comment_or_newline
-                           "ENDDAT" comment_or_newline)
+        data_definition = "DEFDAT" name ["PUBLIC"] comment_or_newline
+                          "ENDDAT" comment_or_newline
         """
         self._eat(KEYWORDS.DEFDAT)
         name = self._eat(TOKENS.NAME)
@@ -231,8 +231,8 @@ class Parser:
 
     def _parameter_definitions(self):
         """
-        parameter_definitions = ([(parameter_definition
-                                 [("," parameter_definition)])])
+        parameter_definitions = [parameter_definition
+                                *("," parameter_definition])
         """
         parameters = []
         if not self._is_current_token(TOKENS.NAME):
@@ -292,7 +292,7 @@ class Parser:
 
     def _parameters(self):
         """
-        parameters = [(name *("," name))]
+        parameters = [name *("," name)]
         """
         parameters = []
         if not self._is_current_token(TOKENS.NAME):
