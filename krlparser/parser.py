@@ -227,7 +227,7 @@ class Parser:
         self._eat(KEYWORDS.ENDDAT)
         self._comment_or_newline()
 
-        return DataDefinition(name=name.value)
+        return DataDefinition(name=name.value, is_public=public_definition)
 
     def _parameter_definitions(self):
         """

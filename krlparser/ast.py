@@ -104,17 +104,19 @@ class FunctionDefinition(AST):
 
 
 class DataDefinition(AST):
-    def __init__(self, *, name, body=[], symbol_table=None):
+    def __init__(self, *, name, body=[], is_public=False, symbol_table=None):
         super().__init__()
 
         self.name = name
         self.body = body
+        self.is_public = is_public
         self.symbol_table = symbol_table
 
     def __repr__(self):
         return (f"DataDefinition("
                 f"name={self.name}, "
                 f"body={self.body}, "
+                f"is_public={self.is_public}, "
                 f"symbol_table={self.symbol_table})")
 
 
