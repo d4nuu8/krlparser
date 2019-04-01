@@ -36,13 +36,13 @@ function_definition = ["GLOBAL"] "DEFFCT" type name "(" parameter_definitions ")
 data_definition = "DEFDAT" name ["PUBLIC"] comment_or_newline
                   "ENDDAT" comment_or_newline
 
-parameter_definitions = [parameter_definition *("," parameter_definition])
+parameter_definitions = [parameter_definition *("," parameter_definition)]
 
 parameter_definition = name ":" ("IN" / "OUT")
 
 variable_declarations_source = [DECL] type name [array] *("," name [array])
 
-array = "[" 1*3integer_number "]"
+array = "[" integer_number 0*2("," integer_number) "]"
 
 statements = *(module_call / comment_or_newline)
 

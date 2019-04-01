@@ -234,6 +234,58 @@ def test_simple_variable_declartion():
     assert awaited_ast == parser.ast
 
 
+def test_simple_array_declartion():
+    source_file = (
+        "DEF Foo()\n"
+        "DECL INT bar[1]\n"
+        "END"
+    )
+
+    awaited_ast = [
+        SourceFile(name="Foo", statements=[
+            FunctionDefinition(name="Foo", body=[
+                VariableSymbol(name="bar", symbol_type="INT",
+                               dimensions=[1])])
+        ])]
+
+    parser = Parser()
+    parser.add_source_file("Foo", source_file)
+
+    assert awaited_ast == parser.ast
+
+
+def test_multi_dimensional_array_declartion():
+    source_file = (
+        "DEF Foo()\n"
+        "DECL INT bar[1, 2, 3]\n"
+        "END"
+    )
+
+    awaited_ast = [
+        SourceFile(name="Foo", statements=[
+            FunctionDefinition(name="Foo", body=[
+                VariableSymbol(name="bar", symbol_type="INT",
+                               dimensions=[1, 2, 3])])
+        ])]
+
+    parser = Parser()
+    parser.add_source_file("Foo", source_file)
+
+    assert awaited_ast == parser.ast
+
+
+def test_invalid_multi_dimensional_array_declartion():
+    source_file = (
+        "DEF Foo()\n"
+        "DECL INT bar[1, 2, 3, 4]\n"
+        "END"
+    )
+
+    parser = Parser()
+    with pytest.raises(ParsingError):
+        parser.add_source_file("Foo", source_file)
+
+
 def test_chained_variable_declartion():
     source_file = (
         "DEF Foo()\n"

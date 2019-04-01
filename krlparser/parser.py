@@ -238,7 +238,7 @@ class Parser:
     def _parameter_definitions(self):
         """
         parameter_definitions = [parameter_definition
-                                *("," parameter_definition])
+                                 *("," parameter_definition)]
         """
         parameters = []
         if not self._is_current_token(TOKENS.NAME):
@@ -277,18 +277,44 @@ class Parser:
 
         if self._try_eat(KEYWORDS.DECL):
             symbol_type = self._eat(TOKENS.NAME).value
+            symbol_name = self._eat(TOKENS.NAME).value
+            array_dimensions = self._array()
             declarations.append(VariableSymbol(
-                name=self._eat(TOKENS.NAME).value,
-                symbol_type=symbol_type
+                name=symbol_name,
+                symbol_type=symbol_type,
+                dimensions=array_dimensions
             ))
 
         while self._try_eat(TOKENS.COMMA):
+            symbol_name = self._eat(TOKENS.NAME).value
+            array_dimensions = self._array()
             declarations.append(VariableSymbol(
-                name=self._eat(TOKENS.NAME).value,
-                symbol_type=symbol_type
+                name=symbol_name,
+                symbol_type=symbol_type,
+                dimensions=array_dimensions
             ))
 
         return declarations
+
+    def _array(self):
+        """
+        array = "[" integer_number 0*2("," integer_number) "]"
+        """
+        if self._try_eat(TOKENS.LEFT_SQUARE_BRACE):
+            dimensions = []
+            dimensions.append(self._eat(TOKENS.INTEGER).value)
+
+            while self._try_eat(TOKENS.COMMA):
+                dimensions.append(self._eat(TOKENS.INTEGER).value)
+
+            if len(dimensions) > 3:
+                self._error(f"Array dimensions must not be greater than 3")
+
+            self._eat(TOKENS.RIGHT_SQUARE_BRACE)
+
+            return dimensions
+
+        return [0]
 
     def _statements(self):
         """

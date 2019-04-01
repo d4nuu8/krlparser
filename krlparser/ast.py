@@ -170,7 +170,21 @@ class Symbol(AST, ABC):
 
 
 class VariableSymbol(Symbol):
-    pass
+    def __init__(self, *, name, symbol_type, dimensions=[0]):
+        super().__init__(name=name, symbol_type=symbol_type)
+
+        self.dimensions = dimensions
+
+    @property
+    def is_array(self):
+        return self.dimensions != [0]
+
+    def __repr__(self):
+        return (f"VariableSymbol("
+                f"name={self.name}, "
+                f"symbol_type={self.type}, "
+                f"is_array={self.is_array}, "
+                f"dimensions={self.dimensions})")
 
 
 class FunctionSymbol(Symbol):
