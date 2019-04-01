@@ -306,3 +306,24 @@ def test_chained_variable_declartion():
     parser.add_source_file("Foo", source_file)
 
     assert awaited_ast == parser.ast
+
+
+def test_chained_array_declartion():
+    source_file = (
+        "DEF Foo()\n"
+        "DECL INT bar1[1, 1], bar2[10]\n"
+        "END"
+    )
+
+    awaited_ast = [
+        SourceFile(name="Foo", statements=[
+            FunctionDefinition(name="Foo", body=[
+                VariableSymbol(name="bar1", symbol_type="INT",
+                               dimensions=[1, 1]),
+                VariableSymbol(name="bar2", symbol_type="INT",
+                               dimensions=[10])])])]
+
+    parser = Parser()
+    parser.add_source_file("Foo", source_file)
+
+    assert awaited_ast == parser.ast
