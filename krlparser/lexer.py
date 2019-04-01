@@ -12,6 +12,8 @@ class Lexer:
 
     CHARACHTERS_ID = FIRST_CHARACTERS_ID + list(string.digits)
 
+    NUMBER_CHARACTERS = list(string.digits) + ["E", "e", ".", "+", "-"]
+
     HEX_CHARACTERS = string.ascii_lowercase[:6] + string.ascii_uppercase[:6]
 
     @property
@@ -244,9 +246,7 @@ class Lexer:
                              column=start)
 
         value = ""
-        while (self._current_char is not None and
-               self._current_char != os.linesep and
-               not self._current_char.isspace()):
+        while self._current_char in self.NUMBER_CHARACTERS:
             value += self._current_char
             self._advance()
 

@@ -307,7 +307,7 @@ def test_binary_operators(token, string):
             == tokens[2])
 
 
-def test_array_access():
+def test_array_access_with_variable():
     lexer = Lexer(code="foo[bar]")
     tokens = lexer.generate_tokens()
     assert (Token(token_type=TOKENS.NAME,
@@ -329,6 +329,31 @@ def test_array_access():
                   value="]",
                   line_number=0,
                   column=7)
+            == tokens[3])
+
+
+def test_array_access_with_integer():
+    lexer = Lexer(code="foo[1]")
+    tokens = lexer.generate_tokens()
+    assert (Token(token_type=TOKENS.NAME,
+                  value="foo",
+                  line_number=0,
+                  column=0)
+            == tokens[0])
+    assert (Token(token_type=TOKENS.LEFT_SQUARE_BRACE,
+                  value="[",
+                  line_number=0,
+                  column=3)
+            == tokens[1])
+    assert (Token(token_type=TOKENS.INTEGER,
+                  value=1,
+                  line_number=0,
+                  column=4)
+            == tokens[2])
+    assert (Token(token_type=TOKENS.RIGHT_SQUARE_BRACE,
+                  value="]",
+                  line_number=0,
+                  column=5)
             == tokens[3])
 
 
