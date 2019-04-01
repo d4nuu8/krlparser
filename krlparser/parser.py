@@ -271,30 +271,36 @@ class Parser:
 
     def _variable_declarations_source(self):
         """
-        [DECL] type name [array] *("," name [array])
+        variable_declarations_source = *([DECL] type name [array]
+                                         *("," name [array])
+                                         comment_or_newline)
         """
         declarations = []
+        while True:
+            if (self._try_eat(KEYWORDS.DECL) or (
+                    self._is_current_token(TOKENS.NAME) and
+                    self._is_next_token(TOKENS.NAME))):
+                symbol_type = self._eat(TOKENS.NAME).value
+                symbol_name = self._eat(TOKENS.NAME).value
+                array_dimensions = self._array()
+                declarations.append(VariableSymbol(
+                    name=symbol_name,
+                    symbol_type=symbol_type,
+                    dimensions=array_dimensions
+                ))
 
-        if self._try_eat(KEYWORDS.DECL):
-            symbol_type = self._eat(TOKENS.NAME).value
-            symbol_name = self._eat(TOKENS.NAME).value
-            array_dimensions = self._array()
-            declarations.append(VariableSymbol(
-                name=symbol_name,
-                symbol_type=symbol_type,
-                dimensions=array_dimensions
-            ))
+                while self._try_eat(TOKENS.COMMA):
+                    symbol_name = self._eat(TOKENS.NAME).value
+                    array_dimensions = self._array()
+                    declarations.append(VariableSymbol(
+                        name=symbol_name,
+                        symbol_type=symbol_type,
+                        dimensions=array_dimensions
+                    ))
 
-        while self._try_eat(TOKENS.COMMA):
-            symbol_name = self._eat(TOKENS.NAME).value
-            array_dimensions = self._array()
-            declarations.append(VariableSymbol(
-                name=symbol_name,
-                symbol_type=symbol_type,
-                dimensions=array_dimensions
-            ))
-
-        return declarations
+                self._comment_or_newline()
+            else:
+                return declarations
 
     def _array(self):
         """

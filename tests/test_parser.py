@@ -234,6 +234,27 @@ def test_simple_variable_declartion():
     assert awaited_ast == parser.ast
 
 
+def test_multiple_variable_declartion():
+    source_file = (
+        "DEF Foo()\n"
+        "DECL INT foo\n"
+        "DECL INT bar\n"
+        "END"
+    )
+
+    awaited_ast = [
+        SourceFile(name="Foo", statements=[
+            FunctionDefinition(name="Foo", body=[
+                VariableSymbol(name="foo", symbol_type="INT"),
+                VariableSymbol(name="bar", symbol_type="INT")])
+        ])]
+
+    parser = Parser()
+    parser.add_source_file("Foo", source_file)
+
+    assert awaited_ast == parser.ast
+
+
 def test_simple_array_declartion():
     source_file = (
         "DEF Foo()\n"
@@ -322,6 +343,28 @@ def test_chained_array_declartion():
                                dimensions=[1, 1]),
                 VariableSymbol(name="bar2", symbol_type="INT",
                                dimensions=[10])])])]
+
+    parser = Parser()
+    parser.add_source_file("Foo", source_file)
+
+    assert awaited_ast == parser.ast
+
+
+def test_declarations_and_statements():
+    source_file = (
+        "DEF Foo()\n"
+        "DECL INT bar\n"
+        "\n"
+        "FooBar()"
+        "END"
+    )
+
+    awaited_ast = [
+        SourceFile(name="Foo", statements=[
+            FunctionDefinition(name="Foo", body=[
+                VariableSymbol(name="bar", symbol_type="INT",
+                               dimensions=[0]),
+                FunctionCall(name="FooBar")])])]
 
     parser = Parser()
     parser.add_source_file("Foo", source_file)

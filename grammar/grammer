@@ -40,7 +40,7 @@ parameter_definitions = [parameter_definition *("," parameter_definition)]
 
 parameter_definition = name ":" ("IN" / "OUT")
 
-variable_declarations_source = [DECL] type name [array] *("," name [array])
+variable_declarations_source = *([DECL] type name [array] *("," name [array]) comment_or_newline)
 
 array = "[" integer_number 0*2("," integer_number) "]"
 
