@@ -14,8 +14,6 @@ class Lexer:
 
     NUMBER_CHARACTERS = list(string.digits) + ["E", "e", ".", "+", "-"]
 
-    HEX_CHARACTERS = string.ascii_lowercase[:6] + string.ascii_uppercase[:6]
-
     @property
     def _token_mapping(self):
         def operator(token):
